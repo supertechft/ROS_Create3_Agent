@@ -1,0 +1,5 @@
+# This file configures Git's handling of line endings for this repository.
+
+# All text files will use LF (Unix-style) line endings in the repository.
+* text=auto
+* text eol=lf

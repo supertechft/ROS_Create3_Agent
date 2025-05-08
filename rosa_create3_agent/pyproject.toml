@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rosa_create3_agent"
+version = "1.0.0"
+description = "Embodied ROS agent for the iRobot Create 3 robot"
+readme = "../README.md"
+authors = [
+    {name = "Prince Singh", email = "psingh@supertechft.org"}
+]
+license = {text = "Apache 2.0"}
+requires-python = ">=3.8"
+dependencies = [
+    "rclpy",
+    "ament-index-python",
+    "jpl-rosa",
+]
+
+[project.urls]
+Homepage = "https://supertechft.org/"
+Repository = "https://github.com/supertechft/ROSA_Create3_Agent"

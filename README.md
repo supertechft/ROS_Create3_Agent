@@ -1,6 +1,6 @@
 # ROSA Create 3 Agent
 
-This project provides a custom [ROSA](https://github.com/nasa-jpl/rosa) agent that enables controlling an [iRobot Create® 3](https://edu.irobot.com/what-we-offer/create3) robot using natural language commands.
+This project uses [ROSA](https://github.com/nasa-jpl/rosa) to create an embodied ROS agent that enables controlling an [iRobot Create® 3](https://edu.irobot.com/what-we-offer/create3) robot using natural language commands.
 
 It supports both physical Create 3 robots and simulation via the [Create 3 Simulator](https://github.com/iRobotEducation/create3_sim).
 
@@ -8,9 +8,9 @@ It supports both physical Create 3 robots and simulation via the [Create 3 Simul
 
 ## Features
 
-- Natural language control of Create 3 movement and actions
+- Natural language control of Create 3 movement and actions via text  or verbal commands 
 - Integrated with ROSA's language understanding capabilities
-- Works with Create 3 simulation in an empty world
+- Works with iRobot Create 3 in a simulation or real environment
 
 ---
 
@@ -18,16 +18,22 @@ It supports both physical Create 3 robots and simulation via the [Create 3 Simul
 
 ### Prerequisites
 
-- ROS 2 Humble (or compatible distro)
-- Python 3.10+
-- [Create 3 ROS 2 interface](https://iroboteducation.github.io/create3_docs/api/ros2/) installed
-- [Create 3 Simulator](https://github.com/iRobotEducation/create3_sim) installed
-- [ROSA](https://github.com/nasa-jpl/rosa) installed:
-  ```bash
-  pip install jpl-rosa
-  ```
+This package was developed and tested on Windows 10 running a virtual machine (via [VirtualBox](https://www.virtualbox.org/)). For a complete written step-by-step environment setup installation guide that includes a ISO image with ROS 2 Humble preinstalled, refer to [this doc](https://docs.google.com/document/d/1ZO-zEPBvO-WpP5zc8WkkO2GKfG2-uJWClost-Xz_afM/edit?usp=sharing).
 
-### Build workspace
+- Ubuntu 22.04
+- ROS 2 Humble
+```bash
+echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+```
+- Python 3.10+
+- OpenAI and HuggingFace inference API Keys // TODO: add details
+- [Create 3 ROS 2 interface](https://iroboteducation.github.io/create3_docs/api/ros2/). See [Setup and Build Workspace](#setup-and-build-workspace).
+- Simulator or physical robot
+  - If you have the [iRobot Create® 3](https://edu.irobot.com/what-we-offer/create3), follow [these steps](https://iroboteducation.github.io/create3_docs/setup/provision/) to set it up and connect to the network.
+  - Otherwise, the [Create 3 Simulator](https://github.com/iRobotEducation/create3_sim/tree/humble). See [Setup and Build Workspace](#setup-and-build-workspace).
+
+
 ```bash
 mkdir -p create3_ws/src
 cd create3_ws/src
@@ -77,7 +83,7 @@ rosa_create3_agent/
 
 ## License
 
-This project is licensed under the (Apache-2.0 license)[LICENSE].
+This project is licensed under the [Apache-2.0 license](LICENSE).
 
 --- 
 

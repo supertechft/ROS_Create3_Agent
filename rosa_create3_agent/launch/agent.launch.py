@@ -1,7 +1,7 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration
+from launch.actions import DeclareLaunchArgument, SetEnvironmentVariable
+from launch.substitutions import LaunchConfiguration, EnvironmentVariable
 
 """
 ROS 2 uses python
@@ -12,17 +12,24 @@ https://docs.ros.org/en/foxy/Tutorials/Intermediate/Launch/Launch-system.html#wr
 def generate_launch_description():
     return LaunchDescription(
         [
+            # Launch arguments
             DeclareLaunchArgument(
-                "streaming",
-                default_value="true",
-                description="Enable streaming response mode",
+                "use_simulator",
+                default_value="false",
+                description="Launch the Create 3 simulator",
             ),
+            # Set environment variable for simulator usage
+            SetEnvironmentVariable(
+                name="USE_SIMULATOR",
+                value=LaunchConfiguration("use_simulator"),
+            ),
+            # Launch the ROSA Create 3 agent
             Node(
-                package="create3_agent",
-                executable="create3_agent.py",
+                package="rosa_create3_agent",
+                executable="agent",
                 name="create3_rosa",
                 output="screen",
-                parameters=[{"streaming": LaunchConfiguration("streaming")}],
+                parameters=[{"use_simulator": LaunchConfiguration("use_simulator")}],
             ),
         ]
     )
