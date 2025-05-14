@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Usage: ./setup_create3_agent.sh [--no-sim] [--ws <workspace_path>] [--run]
+# Usage: ./setup_create3_agent.sh [--sim] [--ws <workspace_path>] [--run]
 
 set -e
 
@@ -8,12 +8,12 @@ set -e
 WS=~/create3_agent_ws
 
 # Parse arguments
-USE_SIM="true"
+USE_SIM="false"
 RUN="false"
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --no-sim)
-      USE_SIM="false"
+    --sim)
+      USE_SIM="true"
       shift
       ;;
     --ws)
@@ -101,7 +101,7 @@ source $WS/install/setup.bash
 echo ""
 echo "Setup complete!"
 if [ "$RUN" == "true" ]; then
-  bash "$(dirname "$0")/launch.sh" ${USE_SIM:+--no-sim} --ws "$WS"
+  bash "$(dirname "$0")/launch.sh" ${USE_SIM:+--sim} --ws "$WS"
 else
   if [ "$USE_SIM" == "true" ]; then
     echo "To launch the simulator: ros2 launch irobot_create_gazebo_bringup create3_gazebo.launch.py"

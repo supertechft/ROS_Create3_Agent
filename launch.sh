@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Usage: ./launch.sh [--no-sim] [--ws <workspace_path>]
+# Usage: ./launch.sh [--sim] [--ws <workspace_path>]
 
 WS=~/create3_agent_ws
-USE_SIM="true"
+USE_SIM="false"
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --no-sim)
-      USE_SIM="false"
+    --sim)
+      USE_SIM="true"
       shift
       ;;
     --ws)
