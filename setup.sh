@@ -85,6 +85,15 @@ rosdep update
 rosdep install --from-paths src --ignore-src -r -y
 
 
+# 4a. Install ROSA w/ ASR (Automatic Speech Recognition) from this fork: https://github.com/supertechft/ROSA/tree/ASR
+echo ""
+echo "Installing ROSA w/ ASR..."
+sudo apt install portaudio19-dev
+pip3 install --upgrade pip
+python3 -m pip install "jpl-rosa @ git+https://github.com/supertechft/ROSA.git@ASR#egg=jpl-rosa"
+python3 -c "import rosa;"
+
+
 # 5. Build workspace
 # If colcon build fails and we get an error like “c++: fatal error: Killed signal terminated program cc1plus, compilation terminated.”
 # Try running it with --parallel-workers 2

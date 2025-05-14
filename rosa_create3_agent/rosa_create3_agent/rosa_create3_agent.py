@@ -5,6 +5,7 @@ ROSA Documentation
 """
 
 import os
+from pathlib import Path
 import rclpy    # https://docs.ros.org/en/humble/p/rclpy/
 from rclpy.node import Node
 from rosa import ROSA
@@ -12,7 +13,7 @@ from rosa import ROSA
 # Import local modules
 from rosa_create3_agent import tools
 from rosa_create3_agent.prompts import get_prompts
-from rosa_create3_agent.llm import get_llm
+from rosa_create3_agent.llm import get_llm, get_HF_inference
 
 
 """ROS 2 node for Create 3 robot agent."""
@@ -27,7 +28,11 @@ class Create3AgentNode(Node):
         super().__init__("create3_agent")
         self.get_logger().info("Starting Create 3 ROSA Agent...")
 
+        # Get ROSA arguments
+        tools.initialize(self)
         llm = get_llm()
+        hf_inference = get_HF_inference()
+        audio_path = str(Path(__file__).parent / 'data' / 'audio.wav')
         prompts = get_prompts()
 
         # Initialize ROSA
@@ -35,6 +40,8 @@ class Create3AgentNode(Node):
             ros_version=2,
             llm=llm,
             tools=[tools],
+            inference=hf_inference,
+            audio_path=audio_path,
             prompts=prompts,
             verbose=False,          # Set to False to reduce terminal output
             streaming=False,        # Set to False to reduce terminal output

@@ -39,7 +39,7 @@ def get_HF_inference():
         raise ValueError("HF_API_KEY environment variable not set")
 
     logger.info("Using HuggingFace Inference API")
-    client = InferenceClient(token=api_key)
+    client = InferenceClient(provider="hf-inference", token=api_key, headers={"Content-Type": "audio/wav"})
     return client
 
 
