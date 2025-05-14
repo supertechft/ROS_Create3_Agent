@@ -1,35 +1,48 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.actions import DeclareLaunchArgument, SetEnvironmentVariable
-from launch.substitutions import LaunchConfiguration, EnvironmentVariable
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.conditions import IfCondition
+from launch_ros.substitutions import FindPackageShare
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 """
-ROS 2 uses python
 https://docs.ros.org/en/foxy/Tutorials/Intermediate/Launch/Launch-system.html#writing-the-launch-file
 """
 
-
 def generate_launch_description():
-    return LaunchDescription(
-        [
-            # Launch arguments
-            DeclareLaunchArgument(
-                "use_simulator",
-                default_value="false",
-                description="Launch the Create 3 simulator",
-            ),
-            # Set environment variable for simulator usage
-            SetEnvironmentVariable(
-                name="USE_SIMULATOR",
-                value=LaunchConfiguration("use_simulator"),
-            ),
-            # Launch the ROSA Create 3 agent
-            Node(
-                package="rosa_create3_agent",
-                executable="agent",
-                name="create3_rosa",
-                output="screen",
-                parameters=[{"use_simulator": LaunchConfiguration("use_simulator")}],
-            ),
-        ]
-    )
+    # Use a variable for the launch argument name
+    use_sim_arg = 'use_simulator'
+    use_sim_lc = LaunchConfiguration(use_sim_arg)
+
+    actions = [
+        # Declare launch argument for simulator usage
+        DeclareLaunchArgument(
+            use_sim_arg,
+            default_value='false',
+            description='Launch the Create 3 simulator',
+        ),
+
+        # Include the Create 3 simulator launch file if use_simulator is true
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([
+                PathJoinSubstitution([
+                    FindPackageShare('irobot_create_gazebo_bringup'),
+                    'launch',
+                    'create3_gazebo.launch.py'
+                ])
+            ]),
+            condition=IfCondition(use_sim_lc)
+        ),
+
+        # Launch the ROSA Create 3 agent
+        Node(
+            package='rosa_create3_agent',
+            executable='agent',
+            name='create3_rosa',
+            output='screen',
+            parameters=[{'use_simulator': use_sim_lc}],
+        ),
+    ]
+
+    return LaunchDescription(actions)
