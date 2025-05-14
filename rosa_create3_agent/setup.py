@@ -18,7 +18,7 @@ setup(
         "setuptools",
         "rclpy",
         "ament-index-python",
-        "jpl-rosa",
+        "jpl-rosa @ git+https://github.com/supertechft/ROSA.git@ASR#egg=jpl-rosa",
     ],
     zip_safe=True,
     maintainer="Prince Singh",
