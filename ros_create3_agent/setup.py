@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 import os
 from glob import glob
 
-package_name = "rosa_create3_agent"
+package_name = "ros_create3_agent"
 
 setup(
     name=package_name,
@@ -11,24 +11,28 @@ setup(
     data_files=[
         ("share/ament_index/resource_index/packages", ["resource/" + package_name]),
         ("share/" + package_name, ["package.xml"]),
-        (os.path.join("share", package_name, "launch"), glob("launch/*.launch.py")),
-        (os.path.join("share", package_name), [".env"]),  # Include .env file in package
+        (os.path.join("share", package_name, "launch"), glob("launch/*.launch.py")), # Launch Files
+        (os.path.join("share", package_name), [".env"]),  # .env file
+        # Web templates and static files
+        (os.path.join("share", package_name, "web/templates"), glob("ros_create3_agent/ros_create3_agent/web/templates/*")),
+        (os.path.join("share", package_name, "web/static/css"), glob("ros_create3_agent/ros_create3_agent/web/static/css/*")),
+        (os.path.join("share", package_name, "web/static/js"), glob("ros_create3_agent/ros_create3_agent/web/static/js/*")),
     ],
     install_requires=[
         "setuptools",
         "rclpy",
-        "ament-index-python",
         "jpl-rosa @ git+https://github.com/supertechft/ROSA.git@ASR#egg=jpl-rosa",
+        "flask",
     ],
     zip_safe=True,
     maintainer="Prince Singh",
     maintainer_email="psingh@supertechft.org",
-    description="Embodied ROSA agent for the iRobot Create 3 robot",
+    description="Embodied ROS agent for the iRobot Create 3 robot",
     license="Apache 2.0",
     tests_require=["pytest"],
     entry_points={
         "console_scripts": [
-            "agent = rosa_create3_agent.rosa_create3_agent:main",
+            "agent = ros_create3_agent.agent:main",
         ],
     },
     python_requires=">=3.8",

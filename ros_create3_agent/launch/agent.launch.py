@@ -35,11 +35,11 @@ def generate_launch_description():
             condition=IfCondition(use_sim_lc)
         ),
 
-        # Launch the ROSA Create 3 agent
+        # Launch the ROS Create 3 agent
         Node(
-            package='rosa_create3_agent',
+            package='ros_create3_agent',
             executable='agent',
-            name='create3_rosa',
+            name='ros_create3_agent',
             output='screen',
             parameters=[{'use_simulator': use_sim_lc}],
         ),

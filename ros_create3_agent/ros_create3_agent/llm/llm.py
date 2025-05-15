@@ -5,9 +5,8 @@ ROSA Documentation
 """
 
 import os
-import logging
-from dotenv import load_dotenv
 import typing
+from dotenv import load_dotenv
 
 # https://python.langchain.com/docs/integrations/chat/openai/
 from langchain_openai import ChatOpenAI
@@ -15,9 +14,11 @@ from langchain_openai import ChatOpenAI
 # https://huggingface.co/docs/inference-providers/providers/hf-inference#automatic-speech-recognition
 from huggingface_hub import InferenceClient
 
-# Configure basic logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Import our centralized logging configuration
+from ros_create3_agent.logging import get_logger
+
+# Get a logger for this module
+logger = get_logger(__name__)
 
 # Load environment variables from .env
 load_dotenv()
@@ -55,7 +56,7 @@ def get_llm():
     logger.info("Using OpenAI LLM")
 
     llm = ChatOpenAI(
-        model_name="gpt-4o",  # or your preferred model
+        model_name="gpt-4o",
         temperature=0,
         max_tokens=None,
         timeout=None,

@@ -1,0 +1,288 @@
+:root {
+  --primary-blue: #4a69bd;
+  --primary-blue-dark: #3c5aa6;
+  --light-gray: #f0f0f0;
+  --lighter-gray: #f9f9f9;
+  --danger-red: #e74c3c;
+  --warning-orange: #f39c12;
+  --purple: #9b59b6;
+  --info-blue: #3498db;
+  --success-green: #2ecc71;
+  --teal: #1abc9c;
+  --muted-gray: #95a5a6;
+  --dark-text: #333;
+  --medium-text: #555;
+  --sensor-high: #c0392b;
+  --sensor-medium: #f39c12;
+  --sensor-low: #27ae60;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f5f5;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.chat-container {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-right: 20px;
+}
+
+.status-panel {
+  flex: 1;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.header {
+  background-color: var(--primary-blue);
+  color: white;
+  padding: 15px 20px;
+  text-align: center;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.audio-hint {
+  font-size: 14px;
+  margin: 5px 0 0;
+  color: var(--light-gray);
+  font-style: italic;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.message {
+  max-width: 70%;
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  border-radius: 20px;
+  word-wrap: break-word;
+}
+
+.user {
+  align-self: flex-end;
+  background-color: var(--primary-blue);
+  color: white;
+  border-bottom-right-radius: 5px;
+}
+
+.agent {
+  align-self: flex-start;
+  background-color: var(--light-gray);
+  color: var(--dark-text);
+  border-bottom-left-radius: 5px;
+}
+
+.agent p {
+  margin: 0.5em 0;
+}
+
+.agent ul,
+.agent ol {
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+}
+
+.agent code {
+  background-color: #e8e8e8;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
+.agent pre {
+  background-color: #f5f5f5;
+  padding: 8px;
+  border-radius: 5px;
+  overflow-x: auto;
+  margin: 0.5em 0;
+}
+
+.agent pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+.agent h1,
+.agent h2,
+.agent h3,
+.agent h4 {
+  margin: 0.5em 0;
+  font-weight: bold;
+}
+
+.agent h1 {
+  font-size: 1.4em;
+}
+
+.agent h2 {
+  font-size: 1.3em;
+}
+
+.agent h3 {
+  font-size: 1.2em;
+}
+
+.agent h4 {
+  font-size: 1.1em;
+}
+
+.robot {
+  align-self: flex-start;
+  background-color: #e67e22;
+  color: white;
+  border-bottom-left-radius: 5px;
+}
+
+.chat-input {
+  display: flex;
+  padding: 15px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 25px;
+  font-size: 16px;
+  outline: none;
+}
+
+.chat-input button {
+  background-color: var(--primary-blue);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 20px;
+  margin-left: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
+.chat-input button:hover {
+  background-color: var(--primary-blue-dark);
+}
+
+.chat-input button.disabled,
+.chat-input button.disabled:hover {
+  background-color: #a0a0a0;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.status-item {
+  margin-bottom: 15px;
+}
+
+.status-label {
+  font-weight: bold;
+  color: var(--medium-text);
+}
+
+.status-value {
+  display: block;
+  margin-top: 5px;
+  padding: 8px 12px;
+  background-color: var(--lighter-gray);
+  border-radius: 5px;
+  color: var(--dark-text);
+}
+
+.hazards-list {
+  min-height: 25px;
+}
+
+.hazard-item {
+  display: block;
+  margin-bottom: 5px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: white;
+}
+
+.hazard-bump {
+  background-color: var(--danger-red);
+}
+
+.hazard-cliff {
+  background-color: var(--warning-orange);
+}
+
+.hazard-wheel-drop {
+  background-color: var(--purple);
+}
+
+.hazard-backup-limit {
+  background-color: var(--info-blue);
+}
+
+.hazard-proximity {
+  background-color: var(--teal);
+}
+
+.hazard-unknown {
+  background-color: var(--muted-gray);
+}
+
+.picked-up {
+  color: white;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.picked-up-true {
+  background-color: var(--danger-red);
+}
+
+.picked-up-false {
+  background-color: var(--success-green);
+}
+
+.sensor-reading {
+  margin-bottom: 3px;
+}
+
+.sensor-reading-high {
+  color: var(--sensor-high);
+  font-weight: bold;
+}
+
+.sensor-reading-medium {
+  color: var(--sensor-medium);
+}
+
+.sensor-reading-low {
+  color: var(--sensor-low);
+}

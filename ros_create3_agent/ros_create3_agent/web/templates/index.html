@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create 3 Robot Assistant</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <!-- Use markdown-it for rendering markdown -->
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
+  <script>
+    // Pass configuration from Python to JavaScript
+    const MAX_MESSAGES = {{ max_chat_history }};
+  </script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="chat-container">
+      <div class="header">
+        <h1>Create 3 Robot Assistant</h1>
+        <p class="audio-hint">Tip: Type "audio" to use voice input!</p>
+      </div>
+      <div class="chat-messages" id="chat-messages"></div>
+      <div class="chat-input">
+        <input type="text" id="message-input" placeholder="Type your message or 'audio' to use voice input...">
+        <button id="send-button">Send</button>
+      </div>
+    </div>
+    <div class="status-panel">
+      <h2>Robot Status</h2>
+      <div class="status-item">
+        <span class="status-label">Battery Level:</span>
+        <span class="status-value" id="battery-level">Unknown</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Dock Status:</span>
+        <span class="status-value" id="dock-status">Unknown</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Hazards:</span>
+        <div class="status-value hazards-list" id="hazards-list">None</div>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Picked Up:</span>
+        <span class="status-value" id="picked-up-status">No</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Proximity Sensors:</span>
+        <div class="status-value" id="proximity-readings">No data</div>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Cliff Sensors:</span>
+        <div class="status-value" id="cliff-readings">No data</div>
+      </div>
+    </div>
+  </div>
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+
+</html>
