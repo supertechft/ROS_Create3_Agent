@@ -83,7 +83,7 @@ fi
 echo ""
 echo "Cloning ROS Create 3 Agent..."
 REPO_DIR="$WS/src/ROS_Create3_Agent"
-REPO_URL="https://github.com/supertechft/ROSA_Create3_Agent.git"
+REPO_URL="https://github.com/supertechft/ROS_Create3_Agent.git"
 if [ ! -d "$REPO_DIR" ]; then
   git clone "$REPO_URL"
 else
