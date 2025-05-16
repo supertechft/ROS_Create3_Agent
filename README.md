@@ -1,6 +1,6 @@
 # ROS Create 3 Agent
 
-This project enables natural language control of an [iRobot Create® 3](https://edu.irobot.com/what-we-offer/create3) robot using ROS 2 and the [ROSA](https://github.com/nasa-jpl/rosa) framework. It supports both physical robots and simulation, and features a web interface with a chat box.
+This project enables natural language control of an [iRobot Create® 3](https://edu.irobot.com/what-we-offer/create3) robot using ROS 2 and the [ROSA](https://github.com/nasa-jpl/rosa) framework. It supports both the physical [Create® 3](https://edu.irobot.com/what-we-offer/create3) robot and the [Create 3 Simulator](https://github.com/iRobotEducation/create3_sim/tree/humble), and features a web interface with a chat box.
 
 ---
 
