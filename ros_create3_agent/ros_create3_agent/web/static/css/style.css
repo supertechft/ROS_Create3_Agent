@@ -263,11 +263,11 @@ body {
 }
 
 .picked-up-true {
-  background-color: var(--danger-red);
+  color: var(--danger-red);
 }
 
 .picked-up-false {
-  background-color: var(--success-green);
+  color: var(--success-green);
 }
 
 .sensor-reading {
@@ -285,4 +285,90 @@ body {
 
 .sensor-reading-low {
   color: var(--sensor-low);
+}
+
+.sensor-high {
+  color: var(--sensor-high);
+  font-weight: bold;
+}
+
+.success-green {
+  color: var(--success-green);
+  font-weight: bold;
+}
+
+.battery-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.battery-status {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  color: white;
+  font-weight: bold;
+}
+
+.battery-status-Charging {
+  background-color: var(--info-blue);
+}
+
+.battery-status-Discharging {
+  background-color: var(--muted-gray);
+}
+
+.battery-status-NotCharging {
+  background-color: var(--warning-orange);
+}
+
+.battery-status-Full {
+  background-color: var(--success-green);
+}
+
+.battery-status-Unknown {
+  background-color: var(--medium-text);
+}
+
+.battery-details {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 0.9em;
+  background-color: var(--lighter-gray);
+  padding: 5px 8px;
+  border-radius: 4px;
+}
+
+.detail-label {
+  color: var(--medium-text);
+  font-weight: bold;
+  margin-right: 3px;
+}
+
+.button-pressed {
+  color: #ff6b00;
+  font-weight: bold;
+}
+
+.robot-stopped {
+  color: #ff0000;
+  font-weight: bold;
+}
+
+.odom-position, .odom-heading, .odom-velocity, .odom-orientation,
+.imu-orientation, .imu-accel, .imu-gyro {
+  margin-bottom: 4px;
+  font-family: monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#odometry-status, #imu-status {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }

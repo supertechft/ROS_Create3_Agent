@@ -7,22 +7,29 @@ document.addEventListener('DOMContentLoaded', function () {
     const dockStatus = document.getElementById('dock-status');
     const hazardsList = document.getElementById('hazards-list');
     const pickedUpStatus = document.getElementById('picked-up-status');
+    const odometryStatus = document.getElementById('odometry-status');
+    const imuStatus = document.getElementById('imu-status');
+    const stopStatus = document.getElementById('stop-status');
     const proximityReadings = document.getElementById('proximity-readings');
     const cliffReadings = document.getElementById('cliff-readings');
     const MAX_MESSAGES = 100;
 
+
     // Initialize markdown-it for agent message formatting
     const md = window.markdownit({ html: false, linkify: true, typographer: true });
+
 
     // Initial load and polling for chat and robot status
     fetchChatHistoryAndRobotStatus();
     setInterval(fetchChatHistoryAndRobotStatus, 500); // Poll every 0.5 seconds
+
 
     // Event listeners for sending messages
     sendButton.addEventListener('click', sendMessage);
     messageInput.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') sendMessage();
     });
+
 
     // Fetch chat history and robot status from the server
     function fetchChatHistoryAndRobotStatus() {
@@ -35,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Error fetching chat history:', error));
     }
 
+
     // Update the chat UI with the latest messages
     function updateChatHistory(history) {
         // Preserve scroll position if user is at the bottom
@@ -45,6 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
         messagesToShow.forEach(addMessageToUI);
         if (wasAtBottom) chatMessages.scrollTop = chatMessages.scrollHeight;
     }
+
 
     // Add a single message to the chat UI
     function addMessageToUI(message) {
@@ -57,10 +66,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Update robot status UI (battery, dock, hazards, sensors)
     function updateRobotStatus(status) {
-        batteryLevel.textContent = status.battery_level;
+        // Update battery information with status
+        const battery = status.battery || {};
+        batteryLevel.textContent = battery.level || "Unknown";
+
+        const batteryStatus = document.getElementById('battery-status');
+        const status_text = battery.status || "Unknown";
+        batteryStatus.textContent = status_text;
+        batteryStatus.className = 'battery-status';
+        batteryStatus.classList.add('battery-status-' + status_text);
+
+        // Update battery voltage and current (2 decimal places)
+        const batteryVoltage = document.getElementById('battery-voltage');
+        const batteryCurrent = document.getElementById('battery-current');
+        const voltage = battery.voltage !== undefined ? battery.voltage.toFixed(2) : "0.00";
+        const current = battery.current !== undefined ? battery.current.toFixed(2) : "0.00";
+        batteryVoltage.textContent = `${voltage} V`;
+        batteryCurrent.textContent = `${current} A`;
+
+        
+        // Update dock status
         dockStatus.textContent = status.dock_status;
+
+
+        // Update hazards list
         hazardsList.innerHTML = '';
-        // Show hazards if present
         if (status.hazards && status.hazards.length > 0) {
             status.hazards.forEach(hazard => {
                 const hazardElement = document.createElement('div');
@@ -73,6 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 else if (hazard.type.includes('OBJECT_PROXIMITY')) hazardType = 'proximity';
                 hazardElement.className = `hazard-item hazard-${hazardType}`;
                 hazardElement.textContent = hazard.description;
+
                 // Add location if available
                 if (hazard.location) {
                     const locationSpan = document.createElement('span');
@@ -85,12 +116,103 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             hazardsList.textContent = 'None';
         }
-        // Picked up status
+
+
+        // Update picked up status
         pickedUpStatus.textContent = status.is_picked_up ? 'Yes' : 'No';
         pickedUpStatus.className = status.is_picked_up ? 'picked-up-true' : 'picked-up-false';
+
+
+        // Update odometry status
+        updateOdometryStatus(odometryStatus, status.odometry);
+
+
+        // Update IMU status
+        updateImuStatus(imuStatus, status.imu);
+
+        
+        // Update stop status
+        updateStopStatus(stopStatus, status.stop_status);
+
+
         // Update sensor readings
         updateSensorReadings(proximityReadings, status.ir_intensities, false);
         updateSensorReadings(cliffReadings, status.cliff_intensities, true);
+    }
+
+
+
+    
+    // Update odometry status display
+    function updateOdometryStatus(container, odometry) {
+        container.innerHTML = '';
+        if (odometry && Object.keys(odometry).length > 0) {
+            // Position
+            const positionDiv = document.createElement('div');
+            positionDiv.className = 'odom-position';
+            const position = odometry.position || {};
+            positionDiv.textContent = `Position: x=${(position.x || 0).toFixed(2)}m, y=${(position.y || 0).toFixed(2)}m`;
+            
+            // Orientation (quaternion)
+            const orientationDiv = document.createElement('div');
+            orientationDiv.className = 'odom-orientation';
+            const orientation = odometry.orientation || {};
+            orientationDiv.textContent = `Orientation: [${(orientation.x || 0).toFixed(2)}, ${(orientation.y || 0).toFixed(2)}, ${(orientation.z || 0).toFixed(2)}, ${(orientation.w || 0).toFixed(2)}]`;
+            
+            // Velocity
+            const velocityDiv = document.createElement('div');
+            velocityDiv.className = 'odom-velocity';
+            const linearVel = odometry.linear_velocity || {};
+            const angularVel = odometry.angular_velocity || {};
+            velocityDiv.textContent = `Speed: ${(linearVel.x || 0).toFixed(2)} m/s, Turn: ${(angularVel.z || 0).toFixed(2)} rad/s`;
+            
+            container.appendChild(positionDiv);
+            container.appendChild(orientationDiv);
+            container.appendChild(velocityDiv);
+        } else {
+            container.textContent = 'No data';
+        }
+    }
+    
+    // Update IMU status display
+    function updateImuStatus(container, imu) {
+        container.innerHTML = '';
+        if (imu && Object.keys(imu).length > 0) {
+            // Orientation (simplified)
+            const orientationDiv = document.createElement('div');
+            orientationDiv.className = 'imu-orientation';
+            const orientation = imu.orientation || {};
+            orientationDiv.textContent = `Orientation: [${(orientation.x || 0).toFixed(2)}, ${(orientation.y || 0).toFixed(2)}, ${(orientation.z || 0).toFixed(2)}, ${(orientation.w || 0).toFixed(2)}]`;
+            
+            // Linear acceleration
+            const accelDiv = document.createElement('div');
+            accelDiv.className = 'imu-accel';
+            const accel = imu.linear_acceleration || {};
+            accelDiv.textContent = `Accel: [${(accel.x || 0).toFixed(2)}, ${(accel.y || 0).toFixed(2)}, ${(accel.z || 0).toFixed(2)}] m/s²`;
+            
+            // Angular velocity
+            const gyroDiv = document.createElement('div');
+            gyroDiv.className = 'imu-gyro';
+            const gyro = imu.angular_velocity || {};
+            gyroDiv.textContent = `Gyro: [${(gyro.x || 0).toFixed(2)}, ${(gyro.y || 0).toFixed(2)}, ${(gyro.z || 0).toFixed(2)}] rad/s`;
+            
+            container.appendChild(orientationDiv);
+            container.appendChild(accelDiv);
+            container.appendChild(gyroDiv);
+        } else {
+            container.textContent = 'No data';
+        }
+    }
+    
+    // Update stop status display
+    function updateStopStatus(container, stopStatus) {
+        if (stopStatus && stopStatus.is_stopped) {
+            container.textContent = "Stopped";
+            container.className = "status-value sensor-high";
+        } else {
+            container.textContent = "Moving";
+            container.className = "status-value success-green";
+        }
     }
 
     // Update proximity or cliff sensor readings
@@ -118,15 +240,19 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+
     // Send a user message to the server and update UI on response
     function sendMessage() {
         const message = messageInput.value.trim();
         if (!message) return;
+
         // Disable input while waiting for server response
         messageInput.disabled = true;
         sendButton.disabled = true;
         sendButton.classList.add('disabled');
         messageInput.value = '';
+
+        // Send message to flask server
         fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

@@ -5,7 +5,21 @@ https://iroboteducation.github.io/create3_docs/api/ros2/
 """
 
 # Re-export core functionality
-from .movement import drive_distance, rotate_angle, navigate_to_position, stop_robot
 from .docking import dock_robot, undock_robot, check_dock_status
-from .info import get_dock_info, get_create3_specs, get_help, get_examples
-from .sensing import check_battery, check_hazards
+from .info import (
+    agent_intro,
+    get_help,
+    get_examples,
+    get_dock_info,
+    get_create3_specs,
+    get_create3_interface,
+)
+from .movement import drive_distance, rotate_angle
+from .sensing import (
+    get_battery_status,
+    check_hazards,
+    get_imu_status,
+    get_kidnap_status,
+    get_odometry,
+    get_stop_status,
+)

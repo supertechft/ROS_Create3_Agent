@@ -52,17 +52,27 @@ class Create3AgentNode(Node, ROSA):
             audio_path=audio_path,
             # tools=[tools], # Explicitly list all tools for clarity
             tools=[
-                tools.agent_intro,
-                tools.get_create3_specs,
-                tools.get_dock_info,
-                tools.get_help,
-                tools.get_examples,
-                tools.check_hazards,
-                tools.drive_distance,
-                tools.rotate_angle,
-                tools.navigate_to_position,
+                # Docking
                 tools.dock_robot,
                 tools.undock_robot,
+                tools.check_dock_status,
+                # Info
+                tools.agent_intro,
+                tools.get_help,
+                tools.get_examples,
+                tools.get_dock_info,
+                tools.get_create3_specs,
+                tools.get_create3_interface,
+                # Movement
+                tools.drive_distance,
+                tools.rotate_angle,
+                # Sensing
+                tools.get_battery_status,
+                tools.check_hazards,
+                tools.get_imu_status,
+                tools.get_kidnap_status,
+                tools.get_odometry,
+                tools.get_stop_status,
             ],
             prompts=prompts,
             verbose=False,  # Reduce terminal output
