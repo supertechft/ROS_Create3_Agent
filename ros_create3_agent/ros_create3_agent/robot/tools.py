@@ -16,6 +16,13 @@ from irobot_create_msgs.action import (
     Undock,
     Dock,
 )
+
+# Import from core modules to re-export
+from .core.docking import (
+    dock_robot,
+    undock_robot,
+    check_dock_status,
+)
 from .core.info import (
     agent_intro,
     get_help,
@@ -23,6 +30,10 @@ from .core.info import (
     get_dock_info,
     get_create3_specs,
     get_create3_interface,
+)
+from .core.movement import (
+    drive_distance,
+    rotate_angle,
 )
 from .core.sensing import (
     get_battery_status,
@@ -32,3 +43,42 @@ from .core.sensing import (
     get_odometry,
     get_stop_status,
 )
+
+# Import robot state manager
+from .robot_state import get_robot_state
+
+# Global variables for shared state
+_node = None
+_drive_distance_client = None
+_rotate_angle_client = None
+_navigate_to_position_client = None
+_dock_client = None
+_undock_client = None
+
+
+def initialize(node: Node):
+    """Initialize all the ROS clients and subscribers."""
+    global _node, _drive_distance_client, _rotate_angle_client, _navigate_to_position_client, _dock_client, _undock_client
+
+    _node = node
+
+    # Action clients
+    _drive_distance_client = ActionClient(_node, DriveDistance, "drive_distance")
+    _rotate_angle_client = ActionClient(_node, RotateAngle, "rotate_angle")
+    _navigate_to_position_client = ActionClient(
+        _node, NavigateToPosition, "navigate_to_position"
+    )
+    _dock_client = ActionClient(_node, Dock, "dock")
+    _undock_client = ActionClient(_node, Undock, "undock")
+
+    # Wait for action servers
+    _node.get_logger().info("Waiting for action servers...")
+    _drive_distance_client.wait_for_server()
+    _rotate_angle_client.wait_for_server()
+    _navigate_to_position_client.wait_for_server()
+    _dock_client.wait_for_server()
+    _undock_client.wait_for_server()
+    _node.get_logger().info("All action servers are ready!")
+
+    # Initialize the robot state with the node
+    get_robot_state(node)

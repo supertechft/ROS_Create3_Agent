@@ -18,10 +18,10 @@ def get_battery_status() -> str:
     Returns:
         str: A message describing the battery status, including charge percentage and charging state.
 
-    This tool queries the robot's battery state and returns a summary suitable for both LLM and UI display.
-    If the battery is low and not charging, a warning is included. Uses sensor_msgs/BatteryState fields.
+    Queries the robot's battery state and returns a summary. Warns if battery is low and not charging.
     """
     try:
+        # Get battery state from robot state manager
         state = get_robot_state().get_state()
         battery = state.get("battery", {})
         battery_level = battery.get("level", "Unknown")
@@ -31,7 +31,11 @@ def get_battery_status() -> str:
         response = f"Battery level: {battery_level}, Status: {status}"
 
         # Warn if battery is low (<20%) and not charging or full
-        if percentage < 20 and status not in ("Charging", "Full"):
+        if (
+            isinstance(percentage, (int, float))
+            and percentage < 20
+            and status not in ("Charging", "Full")
+        ):
             response += "\n ⚠️ Battery level is low! Consider docking the robot soon."
 
         return response
@@ -47,11 +51,10 @@ def check_hazards() -> str:
     Returns:
         str: A message describing any detected hazards or confirming the path is clear.
 
-    This tool combines hazards reported by the robot's sensors (bumper, cliff, wheel drop, backup limit, etc.)
-    with a synthetic hazard if any IR proximity sensor detects an object very close (intensity > 50).
-    This ensures the robot does not move into obstacles that are not reported by the standard hazard_detection topic.
+    Combines hazards reported by the robot's sensors with a synthetic hazard if any IR proximity sensor detects an object very close (intensity > 50).
     """
     try:
+        # Get hazard and IR sensor state
         state = get_robot_state().get_state()
         hazards = state.get("hazards", [])
         ir_intensities = state.get("ir_intensities", {})
@@ -93,18 +96,12 @@ def get_imu_status() -> str:
     Get the robot's IMU (Inertial Measurement Unit) sensor readings.
 
     Returns:
-        str: A summary of the robot's orientation (quaternion), acceleration (x, y, z),
-             and angular velocity (x, y, z) measurements.
+        str: A summary of the robot's orientation (quaternion), acceleration (x, y, z), and angular velocity (x, y, z).
 
-    This tool provides access to the sensor_msgs/Imu topic data, which is useful for:
-    - Understanding the robot's current orientation in space
-    - Detecting acceleration forces being applied to the robot
-    - Monitoring rotational velocity around each axis
-
-    The data can help diagnose movement issues, detect instability, or verify
-    that the robot is moving as expected.
+    Provides access to the sensor_msgs/Imu topic data.
     """
     try:
+        # Get IMU data from robot state manager
         state = get_robot_state().get_state()
         imu_data = state.get("imu", {})
 
@@ -141,21 +138,15 @@ def get_imu_status() -> str:
 @tool
 def get_kidnap_status() -> str:
     """
-    Check if the robot has been "kidnapped" (picked up or moved unexpectedly).
+    Check if the robot has been 'kidnapped' (picked up or moved unexpectedly).
 
     Returns:
-        str: A message indicating whether the robot is currently picked up
-             and how to handle this situation.
+        str: A message indicating whether the robot is currently picked up.
 
-    This tool reports the status from the KidnapStatus topic, which detects
-    when the robot has been lifted off the ground. This is useful for:
-    - Safety checks before movement
-    - Diagnosing unexpected behavior
-    - Instructing users to place the robot back on the ground
-
-    The robot should always be on a flat surface during normal operation.
+    Reports the status from the KidnapStatus topic, which detects when the robot has been lifted off the ground.
     """
     try:
+        # Get kidnap status from robot state manager
         state = get_robot_state().get_state()
         is_picked_up = state.get("is_picked_up", False)
 
@@ -178,18 +169,10 @@ def get_odometry() -> str:
     Returns:
         str: A message containing the robot's current position (x, y), orientation (quaternion) and velocity.
 
-    This tool provides access to nav_msgs/Odometry data, which includes:
-    - Position of the robot in the global coordinate frame
-    - Orientation as a quaternion
-    - Linear velocity (forward/backward speed)
-    - Angular velocity (turning speed)
-
-    The data is useful for:
-    - Tracking the robot's movement over time
-    - Determining how far the robot has traveled
-    - Monitoring if the robot is moving as expected
+    Provides access to nav_msgs/Odometry data.
     """
     try:
+        # Get odometry data from robot state manager
         state = get_robot_state().get_state()
         odom_data = state.get("odometry", {})
 
@@ -233,11 +216,10 @@ def get_stop_status() -> str:
     Returns:
         str: A message indicating whether the robot is stopped.
 
-    This tool reports if the robot has been stopped due to a safety trigger
-    or other reasons. This is useful for diagnosing why the robot may not
-    be moving as expected or for confirming that a stop command was successful.
+    Reports if the robot has been stopped due to a safety trigger or other reasons.
     """
     try:
+        # Get stop status from robot state manager
         state = get_robot_state().get_state()
         stop_status = state.get("stop_status", {})
 
