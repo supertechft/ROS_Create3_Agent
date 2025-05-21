@@ -3,7 +3,8 @@ Movement operations for the Create 3 robot.
 This module contains tools for controlling robot movement including driving and rotation.
 
 All movement operations utilize ROS action clients defined in tools.py.
-https://iroboteducation.github.io/create3_docs/api/movement/
+https://iroboteducation.github.io/create3_docs/api/moving-the-robot/
+https://iroboteducation.github.io/create3_docs/api/drive-goals/
 """
 
 from langchain.agents import tool
@@ -53,7 +54,7 @@ def drive_distance(distance: float) -> str:
             return "Invalid distance parameter. Must be a number."
 
         # Safety check: Ensure no hazards before moving
-        hazard_result = check_hazards()
+        hazard_result = check_hazards.invoke({})
         if hazard_result.startswith("⚠️ Hazards detected:"):
             web.add_robot_message(f"🤖 Cannot move due to hazards. {hazard_result}")
             return f"Movement canceled: {hazard_result}"
@@ -100,7 +101,7 @@ def rotate_angle(angle_degrees: float) -> str:
             return "Invalid angle_degrees parameter. Must be a number."
 
         # Safety check: Ensure no hazards before rotating
-        hazard_result = check_hazards()
+        hazard_result = check_hazards.invoke({})
         if hazard_result.startswith("⚠️ Hazards detected:"):
             web.add_robot_message(f"🤖 Cannot rotate due to hazards. {hazard_result}")
             return f"Rotation canceled: {hazard_result}"

@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
         batteryVoltage.textContent = `${voltage} V`;
         batteryCurrent.textContent = `${current} A`;
 
-        
+
         // Update dock status
         dockStatus.textContent = status.dock_status;
 
@@ -119,8 +119,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         // Update picked up status
-        pickedUpStatus.textContent = status.is_picked_up ? 'Yes' : 'No';
-        pickedUpStatus.className = status.is_picked_up ? 'picked-up-true' : 'picked-up-false';
+        if (status.is_picked_up === null) {
+            pickedUpStatus.textContent = 'Unknown';
+            pickedUpStatus.className = '';
+        } else {
+            pickedUpStatus.textContent = status.is_picked_up ? 'Yes' : 'No';
+            pickedUpStatus.className = status.is_picked_up ? 'picked-up-true' : 'picked-up-false';
+        }
 
 
         // Update odometry status
@@ -130,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Update IMU status
         updateImuStatus(imuStatus, status.imu);
 
-        
+
         // Update stop status
         updateStopStatus(stopStatus, status.stop_status);
 
@@ -141,8 +146,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-
-    
     // Update odometry status display
     function updateOdometryStatus(container, odometry) {
         container.innerHTML = '';
@@ -152,20 +155,20 @@ document.addEventListener('DOMContentLoaded', function () {
             positionDiv.className = 'odom-position';
             const position = odometry.position || {};
             positionDiv.textContent = `Position: x=${(position.x || 0).toFixed(2)}m, y=${(position.y || 0).toFixed(2)}m`;
-            
+
             // Orientation (quaternion)
             const orientationDiv = document.createElement('div');
             orientationDiv.className = 'odom-orientation';
             const orientation = odometry.orientation || {};
             orientationDiv.textContent = `Orientation: [${(orientation.x || 0).toFixed(2)}, ${(orientation.y || 0).toFixed(2)}, ${(orientation.z || 0).toFixed(2)}, ${(orientation.w || 0).toFixed(2)}]`;
-            
+
             // Velocity
             const velocityDiv = document.createElement('div');
             velocityDiv.className = 'odom-velocity';
             const linearVel = odometry.linear_velocity || {};
             const angularVel = odometry.angular_velocity || {};
             velocityDiv.textContent = `Speed: ${(linearVel.x || 0).toFixed(2)} m/s, Turn: ${(angularVel.z || 0).toFixed(2)} rad/s`;
-            
+
             container.appendChild(positionDiv);
             container.appendChild(orientationDiv);
             container.appendChild(velocityDiv);
@@ -173,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
             container.textContent = 'No data';
         }
     }
-    
+
     // Update IMU status display
     function updateImuStatus(container, imu) {
         container.innerHTML = '';
@@ -183,19 +186,19 @@ document.addEventListener('DOMContentLoaded', function () {
             orientationDiv.className = 'imu-orientation';
             const orientation = imu.orientation || {};
             orientationDiv.textContent = `Orientation: [${(orientation.x || 0).toFixed(2)}, ${(orientation.y || 0).toFixed(2)}, ${(orientation.z || 0).toFixed(2)}, ${(orientation.w || 0).toFixed(2)}]`;
-            
+
             // Linear acceleration
             const accelDiv = document.createElement('div');
             accelDiv.className = 'imu-accel';
             const accel = imu.linear_acceleration || {};
             accelDiv.textContent = `Accel: [${(accel.x || 0).toFixed(2)}, ${(accel.y || 0).toFixed(2)}, ${(accel.z || 0).toFixed(2)}] m/s²`;
-            
+
             // Angular velocity
             const gyroDiv = document.createElement('div');
             gyroDiv.className = 'imu-gyro';
             const gyro = imu.angular_velocity || {};
             gyroDiv.textContent = `Gyro: [${(gyro.x || 0).toFixed(2)}, ${(gyro.y || 0).toFixed(2)}, ${(gyro.z || 0).toFixed(2)}] rad/s`;
-            
+
             container.appendChild(orientationDiv);
             container.appendChild(accelDiv);
             container.appendChild(gyroDiv);
@@ -203,10 +206,13 @@ document.addEventListener('DOMContentLoaded', function () {
             container.textContent = 'No data';
         }
     }
-    
+
     // Update stop status display
     function updateStopStatus(container, stopStatus) {
-        if (stopStatus && stopStatus.is_stopped) {
+        if (!stopStatus || stopStatus.is_stopped === null) {
+            container.textContent = "Unknown";
+            container.className = "status-value";
+        } else if (stopStatus.is_stopped) {
             container.textContent = "Stopped";
             container.className = "status-value sensor-high";
         } else {
