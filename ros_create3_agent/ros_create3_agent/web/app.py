@@ -31,11 +31,10 @@ app = Flask(
 )
 
 # Set in initialize()
-agent_node = None
-agent_rosa = None
+rosa = None
 robot_state = None
 
-# Our own chat history (list of dicts: {content, sender})
+# Chat history (list of dicts: {content, sender (user/robot/agent)})
 chat_history = []
 
 
@@ -61,11 +60,10 @@ def _add_agent_message(content: str):
     _trim_chat_history()
 
 
-def initialize(node: Node, rosa_agent) -> None:
+def initialize(node: Node, ros_agent) -> None:
     """Initialize the web interface for the Create 3 robot agent."""
-    global agent_node, agent_rosa, robot_state
-    agent_node = node
-    agent_rosa = rosa_agent
+    global rosa, robot_state
+    rosa = ros_agent
     robot_state = get_robot_state(node)
     welcome_msg = "Welcome to the Create 3 Robot Assistant. How can I help you today?"
     _add_agent_message(welcome_msg)
@@ -88,12 +86,26 @@ def _run_flask_app() -> None:
 
 def _process_user_input(user_input: str) -> str:
     logger.info(f"Processing command via web: {user_input}")
-    # Add user message immediately
-    _add_user_message(user_input)
+    _add_user_message(user_input)  # Add user message to chat history
     try:
-        # Call ROSA agent, get response (AI message)
-        response = agent_rosa.invoke(user_input)
-        # Add agent (AI) message
+        # Check if the user input is an audio command
+        if user_input.lower().strip() == "audio":
+            logger.info("Listening for verbal input...")
+            _add_agent_message("Listening...")
+            
+            # Get audio transcription from Rosa
+            transcription = rosa.listen()
+            if transcription:
+                logger.info(f"Transcribed audio: {transcription}")
+                _add_user_message(f"🎤 {transcription}")
+                response = rosa.invoke(transcription)
+            else:
+                logger.warning("No speech detected or transcription failed")
+                response = "I couldn't hear anything or understand what was said. Please try again."
+        else:
+            # Regular text input processing
+            response = rosa.invoke(user_input)
+            
         _add_agent_message(response)
         return response
     except Exception as e:
@@ -122,11 +134,8 @@ def post_message():
         return jsonify({"error": "Invalid request"}), 400
 
     user_input = request.json["message"]
-
-    # Process the message
     response = _process_user_input(user_input)
 
-    # Return updated chat history
     return jsonify(
         {
             "history": _get_chat_history(),
