@@ -135,51 +135,54 @@ class RobotState:
 
     def _setup_subscriptions(self):
         """Set up all the ROS topic subscriptions."""
+        from rclpy.qos import QoSProfile, ReliabilityPolicy
+        qos_profile = QoSProfile(reliability=ReliabilityPolicy.BEST_EFFORT, depth=10)
+
         # Hazard detection
         self.node.create_subscription(
-            HazardDetectionVector, "hazard_detection", self._hazard_callback, 10
+            HazardDetectionVector, "hazard_detection", self._hazard_callback, qos_profile
         )
 
         # Dock status
         self.node.create_subscription(
-            DockStatus, "dock_status", self._dock_status_callback, 10
+            DockStatus, "dock_status", self._dock_status_callback, qos_profile
         )
 
         # Battery state
         self.node.create_subscription(
-            BatteryState, "battery_state", self._battery_callback, 10
+            BatteryState, "battery_state", self._battery_callback, qos_profile
         )
 
         # Kidnap (picked up) status
         self.node.create_subscription(
-            KidnapStatus, "kidnap_status", self._kidnap_callback, 10
+            KidnapStatus, "kidnap_status", self._kidnap_callback, qos_profile
         )
 
         # IR intensity (proximity sensors)
         self.node.create_subscription(
-            IrIntensityVector, "ir_intensity", self._ir_intensity_callback, 10
+            IrIntensityVector, "ir_intensity", self._ir_intensity_callback, qos_profile
         )
 
         # Cliff intensity
         # TODO: topic doesn't seem to be publishing in SIM, check real robot
         self.node.create_subscription(
-            IrIntensityVector, "cliff_intensity", self._cliff_intensity_callback, 10
+            IrIntensityVector, "cliff_intensity", self._cliff_intensity_callback, qos_profile
         )
 
         # Interface buttons
         self.node.create_subscription(
-            InterfaceButtons, "interface_buttons", self._interface_buttons_callback, 10
+            InterfaceButtons, "interface_buttons", self._interface_buttons_callback, qos_profile
         )
 
         # IMU data
-        self.node.create_subscription(Imu, "imu", self._imu_callback, 10)
+        self.node.create_subscription(Imu, "imu", self._imu_callback, qos_profile)
 
         # Odometry data
-        self.node.create_subscription(Odometry, "odom", self._odometry_callback, 10)
+        self.node.create_subscription(Odometry, "odom", self._odometry_callback, qos_profile)
 
         # Stop status
         self.node.create_subscription(
-            StopStatus, "stop_status", self._stop_status_callback, 10
+            StopStatus, "stop_status", self._stop_status_callback, qos_profile
         )
 
     def _hazard_callback(self, msg: HazardDetectionVector) -> None:

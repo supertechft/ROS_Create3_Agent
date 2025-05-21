@@ -55,6 +55,7 @@ def dock_robot() -> str:
 
         result_future = goal_handle.get_result_async()
         rclpy.spin_until_future_complete(_get_node(), result_future)
+        # TODO: Check if the robot is actually docked
         result_message = "Robot successfully docked"
         web.add_robot_message(f"🤖 {result_message}")
 

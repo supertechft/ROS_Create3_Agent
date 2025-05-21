@@ -86,6 +86,17 @@ sudo apt-get update
 sudo apt-get install -y ros-$ROS_DISTRO-irobot-create-msgs portaudio19-dev python3-rosdep python3-colcon-common-extensions
 
 
+# Set ROS 2 middleware
+# https://iroboteducation.github.io/create3_docs/setup/xml-config/
+echo ""
+echo "Setting ROS 2 middleware..."
+sudo apt-get install -y ros-$ROS_DISTRO-rmw-fastrtps-cpp
+if ! grep -Fxq "export RMW_IMPLEMENTATION=rmw_fastrtps_cpp" ~/.bashrc; then
+  echo "export RMW_IMPLEMENTATION=rmw_fastrtps_cpp" >> ~/.bashrc
+fi
+source ~/.bashrc
+
+
 # Create workspace
 echo ""
 echo "Setting up ROS 2 Create 3 Agent workspace at $WS..."
