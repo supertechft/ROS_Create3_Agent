@@ -102,14 +102,14 @@ class RobotState:
         self._state = {
             "battery": {},
             "dock_status": "Unknown",
-            "is_picked_up": False,
+            "is_picked_up": None,
             "hazards": [],
             "ir_intensities": {},
             "cliff_intensities": {},
             "button_states": {
-                "button_1": False,  # Left button on faceplate marked with 1 dot
-                "button_power": False,  # Power button on faceplate marked with a power symbol
-                "button_2": False,  # Right button on faceplate marked with 2 dots
+                "button_1": None,  # Left button on faceplate marked with 1 dot
+                "button_power": None,  # Power button on faceplate marked with a power symbol
+                "button_2": None,  # Right button on faceplate marked with 2 dots
             },
             "imu": {
                 "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0},
@@ -122,7 +122,7 @@ class RobotState:
                 "linear_velocity": {"x": 0.0, "y": 0.0, "z": 0.0},
                 "angular_velocity": {"x": 0.0, "y": 0.0, "z": 0.0},
             },
-            "stop_status": {"is_stopped": False},
+            "stop_status": {"is_stopped": None},
         }
 
         # Callback registration
