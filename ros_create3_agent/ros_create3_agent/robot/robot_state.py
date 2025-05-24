@@ -95,7 +95,10 @@ class RobotState:
                 "current": None,
                 "status": "Unknown",
             },
-            "dock_status": "Unknown",
+            "dock_status": {
+                "is_docked": None,
+                "dock_visible": None
+            },
             "is_picked_up": None,
             "hazards": [],
             "ir_intensities": {},
@@ -162,7 +165,7 @@ class RobotState:
         )
 
         # Cliff intensity
-        # TODO: topic doesn't seem to be publishing in SIM, check real robot
+        #! cliff_intensity topic doesn't seem to be publishing in SIM
         self.node.create_subscription(
             IrIntensityVector,
             "cliff_intensity",
@@ -226,7 +229,10 @@ class RobotState:
     def _dock_status_callback(self, msg: DockStatus) -> None:
         """Callback for dock status messages."""
         with self._state_lock:
-            self._state["dock_status"] = "Docked" if msg.is_docked else "Undocked"
+            self._state["dock_status"] = {
+                "is_docked": msg.is_docked,
+                "dock_visible": msg.dock_visible
+            }
 
         self._notify_update()
 

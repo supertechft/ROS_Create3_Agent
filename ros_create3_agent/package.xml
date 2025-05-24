@@ -6,8 +6,8 @@
   <version>1.0.0</version>
   <description>Embodied ROS agent for the iRobot Create 3 robot.</description>
 
-  <!-- TODO: Add maintainers -->
   <maintainer email="psingh@supertechft.org">Prince Singh</maintainer>
+  <maintainer email="cquach@supertechft.org">Calvin Quach</maintainer>
 
   <license>Apache 2.0</license>
 

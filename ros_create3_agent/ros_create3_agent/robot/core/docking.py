@@ -4,6 +4,7 @@ This module contains tools for docking, undocking, and checking dock status.
 https://iroboteducation.github.io/create3_docs/api/docking/
 """
 
+import time
 from langchain.agents import tool
 from ros_create3_agent.web import app as web
 from ..robot_state import get_robot_state
@@ -31,6 +32,95 @@ def _get_undock_client():
     return _get_tools()._undock_client
 
 
+def _get_dock_status_info():
+    """Get dock status info."""
+    robot_state = get_robot_state()
+    state = robot_state.get_state()
+    dock_status = state.get("dock_status", {})
+
+    return dock_status.get("dock_visible"), dock_status.get("is_docked")
+
+
+def _check_dock_visibility_and_warn(dock_visible, operation="dock"):
+    """Check visibility and warn."""
+    if dock_visible is False:
+        warning_msg = f"⚠️ Dock is not visible to robot sensors. {operation.capitalize()}ing may fail."
+        web.add_robot_message(f"🤖 {warning_msg}")
+        _get_node().get_logger().warn(
+            f"Dock not visible, attempting to {operation} anyway"
+        )
+    elif dock_visible is None:
+        warning_msg = f"⚠️ Dock visibility unknown. Proceeding with {operation} attempt."
+        web.add_robot_message(f"🤖 {warning_msg}")
+
+
+def _execute_dock_action(action_client, goal, action_name):
+    """Execute dock action."""
+    _get_node().get_logger().info(f"{action_name}...")
+    web.add_robot_message(f"🤖 Attempting to {action_name.lower()}...")
+
+    future = action_client.send_goal_async(goal)
+    rclpy.spin_until_future_complete(_get_node(), future)
+    goal_handle = future.result()
+
+    if not goal_handle.accepted:
+        web.add_robot_message(f"🤖 {action_name} goal was rejected")
+        return False
+
+    result_future = goal_handle.get_result_async()
+    rclpy.spin_until_future_complete(_get_node(), result_future)
+
+    return True
+
+
+def _get_status_message(include_details=True):
+    """Get status message."""
+    dock_visible, is_docked = _get_dock_status_info()
+    battery = get_robot_state().get_state().get("battery", {})
+    battery_status = battery.get("status", "Unknown")
+
+    if is_docked:
+        charging = ""
+        if battery_status == "Charging":
+            charging = " and actively charging"
+        elif battery_status == "Idle":
+            charging = " with battery idle"
+        elif battery_status == "Discharging":
+            charging = " but discharging (check connections)"
+
+        level = ""
+        if include_details and isinstance(battery.get("percentage"), (int, float)):
+            level = f" (Battery level: {battery['percentage']}%)"
+
+        return f"docked{charging}{level}"
+    else:
+        if not include_details:
+            return "not docked"
+        if dock_visible is True:
+            return "not docked. The dock is visible to the robot sensors."
+        elif dock_visible is False:
+            return "not docked. The dock is not visible to the robot sensors."
+        else:
+            return "not docked. Dock visibility is unknown."
+
+
+def _verify_operation_result(expected_docked_state, operation, robot_state):
+    """Verify dock/undock result."""
+    time.sleep(1)  # Give a moment for status to update
+
+    updated_state = robot_state.get_state()
+    final_is_docked = updated_state.get("dock_status", {}).get("is_docked")
+
+    if final_is_docked == expected_docked_state:
+        web.add_robot_message(f"🤖 ✅ Robot successfully {operation}ed")
+    else:
+        status = _get_status_message(include_details=False)
+        result_message = f"{operation.capitalize()} command completed, but robot is {status}. Please verify {operation}ing manually."
+        web.add_robot_message(f"🤖 ⚠️ {result_message}")
+
+    return result_message
+
+
 @tool
 def dock_robot() -> str:
     """
@@ -42,27 +132,30 @@ def dock_robot() -> str:
     Sends the robot to search for and connect to its charging dock. Useful for charging, moving to a known position, or starting recharge when battery is low.
     """
     try:
-        goal = Dock.Goal()
-        _get_node().get_logger().info("Docking...")
-        web.add_robot_message("🤖 Attempting to dock...")
-        future = _get_dock_client().send_goal_async(goal)
-        rclpy.spin_until_future_complete(_get_node(), future)
-        goal_handle = future.result()
+        # Get current dock status information
+        robot_state = get_robot_state()
+        dock_visible, is_docked = _get_dock_status_info()
 
-        if not goal_handle.accepted:
-            web.add_robot_message("🤖 Dock goal was rejected")
+        # Check if already docked
+        if is_docked:
+            message = "Robot is already docked"
+            web.add_robot_message(f"🤖 {message}")
+            return message
+
+        # Check dock visibility and warn if needed
+        _check_dock_visibility_and_warn(dock_visible, "dock")
+
+        # Execute docking action
+        goal = Dock.Goal()
+        if not _execute_dock_action(_get_dock_client(), goal, "Docking"):
             return "Dock goal was rejected"
 
-        result_future = goal_handle.get_result_async()
-        rclpy.spin_until_future_complete(_get_node(), result_future)
-        # TODO: Check if the robot is actually docked
-        result_message = "Robot successfully docked"
-        web.add_robot_message(f"🤖 {result_message}")
+        # Verify operation result
+        return _verify_operation_result(True, "dock", robot_state)
 
-        return result_message
     except Exception as e:
         error_message = f"Error while attempting to dock: {e}"
-        web.add_robot_message(f"🤖 {error_message}")
+        web.add_robot_message(f"🤖 ❌ {error_message}")
         return error_message
 
 
@@ -77,26 +170,27 @@ def undock_robot() -> str:
     Commands the robot to disengage from its charging dock and back away to become available for other operations.
     """
     try:
-        goal = Undock.Goal()
-        _get_node().get_logger().info("Undocking...")
-        web.add_robot_message("🤖 Attempting to undock...")
-        future = _get_undock_client().send_goal_async(goal)
-        rclpy.spin_until_future_complete(_get_node(), future)
-        goal_handle = future.result()
+        # Get current dock status information
+        robot_state = get_robot_state()
+        dock_visible, is_docked = _get_dock_status_info()
 
-        if not goal_handle.accepted:
-            web.add_robot_message("🤖 Undock goal was rejected")
+        # Check if robot is already undocked
+        if not is_docked:
+            message = "Robot is already undocked"
+            web.add_robot_message(f"🤖 {message}")
+            return message
+
+        # Execute undocking action
+        goal = Undock.Goal()
+        if not _execute_dock_action(_get_undock_client(), goal, "Undocking"):
             return "Undock goal was rejected"
 
-        result_future = goal_handle.get_result_async()
-        rclpy.spin_until_future_complete(_get_node(), result_future)
-        result_message = "Robot successfully undocked"
-        web.add_robot_message(f"🤖 {result_message}")
+        # Verify operation result
+        return _verify_operation_result(False, "undock", robot_state)
 
-        return result_message
     except Exception as e:
         error_message = f"Error while attempting to undock: {e}"
-        web.add_robot_message(f"🤖 {error_message}")
+        web.add_robot_message(f"🤖 ❌ {error_message}")
         return error_message
 
 
@@ -111,30 +205,7 @@ def check_dock_status() -> str:
     Queries the robot's docking state and battery status to determine if it is docked and whether it is charging.
     """
     try:
-        robot_state = get_robot_state()
-        state = robot_state.get_state()
-        dock_status = state.get("dock_status", "Unknown")
-        is_docked = dock_status == "Docked"
-
-        battery = state.get("battery", {})
-        battery_status = battery.get("status", "Unknown")
-        battery_level = battery.get("percentage", "Unknown")
-
-        if is_docked:
-            charging_status = ""
-            if battery_status == "Charging":
-                charging_status = " and actively charging"
-            elif battery_status == "Full":
-                charging_status = " with a full battery"
-            elif battery_status == "NotCharging":
-                charging_status = " but not currently charging"
-
-            battery_info = ""
-            if isinstance(battery_level, (int, float)):
-                battery_info = f" (Battery level: {battery_level}%)"
-
-            return f"The robot is currently docked{charging_status}.{battery_info}"
-        else:
-            return "The robot is not docked."
+        status = _get_status_message(include_details=True)
+        return f"The robot is currently {status}."
     except Exception as e:
         return f"Error checking dock status: {e}"

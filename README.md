@@ -66,7 +66,6 @@ The script mentioned in the next section sets up the workspace, installs the Cre
   Edit `.env` file to add your `OPENAI_API_KEY` and `HF_API_KEY`. 
   - Get OpenAI key at https://platform.openai.com/account/api-keys
   - Get HuggingFace key at https://huggingface.co/settings/tokens
-  // TODO: .env must be edited before colcon build in setup.sh
 
 ---
 

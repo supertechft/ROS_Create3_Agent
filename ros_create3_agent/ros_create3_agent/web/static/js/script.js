@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         // Update dock status
-        dockStatus.textContent = status.dock_status;
+        updateDockStatus(status.dock_status);
 
 
         // Update hazards list
@@ -145,6 +145,40 @@ document.addEventListener('DOMContentLoaded', function () {
         updateSensorReadings(cliffReadings, status.cliff_intensities, true);
     }
 
+
+    // Update dock status display
+    function updateDockStatus(dockStatusInfo) {
+        const dockStatusElement = document.getElementById('dock-status');
+        const dockVisibleElement = document.getElementById('dock-visible');
+
+        const dockData = dockStatusInfo || {};
+        const isDocked = dockData.is_docked;
+        const isVisible = dockData.dock_visible;
+
+        // Update docked status (Yes/No like picked-up-status)
+        if (isDocked === null || isDocked === undefined) {
+            dockStatusElement.textContent = 'Unknown';
+            dockStatusElement.className = 'status-value';
+        } else if (isDocked) {
+            dockStatusElement.textContent = 'Yes';
+            dockStatusElement.className = 'status-value picked-up-true';
+        } else {
+            dockStatusElement.textContent = 'No';
+            dockStatusElement.className = 'status-value picked-up-false';
+        }
+
+        // Update station visible status (Yes/No)
+        if (isVisible === null || isVisible === undefined) {
+            dockVisibleElement.textContent = 'Unknown';
+            dockVisibleElement.className = 'status-value';
+        } else if (isVisible) {
+            dockVisibleElement.textContent = 'Yes';
+            dockVisibleElement.className = 'status-value picked-up-true';
+        } else {
+            dockVisibleElement.textContent = 'No';
+            dockVisibleElement.className = 'status-value picked-up-false';
+        }
+    }
 
     // Update odometry status display
     function updateOdometryStatus(container, odometry) {
