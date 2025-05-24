@@ -112,7 +112,8 @@ def _verify_operation_result(expected_docked_state, operation, robot_state):
     final_is_docked = updated_state.get("dock_status", {}).get("is_docked")
 
     if final_is_docked == expected_docked_state:
-        web.add_robot_message(f"🤖 ✅ Robot successfully {operation}ed")
+        result_message = f"Robot successfully {operation}ed"
+        web.add_robot_message(f"🤖 ✅ {result_message}")
     else:
         status = _get_status_message(include_details=False)
         result_message = f"{operation.capitalize()} command completed, but robot is {status}. Please verify {operation}ing manually."
