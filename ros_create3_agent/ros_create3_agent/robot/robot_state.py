@@ -43,18 +43,6 @@ HAZARD_DESCRIPTIONS = {
     "OBJECT_PROXIMITY": "The robot has detected an object in close proximity",
 }
 
-
-# Map of battery power supply status values from sensor_msgs/BatteryState
-# https://docs.ros.org/en/jade/api/sensor_msgs/html/msg/BatteryState.html
-POWER_SUPPLY_STATUS = {
-    0: "Unknown",
-    1: "Charging",
-    2: "Discharging",
-    3: "NotCharging",
-    4: "Full",
-}
-
-
 # Map of IR proximity sensor positions
 """
 https://github.com/iRobotEducation/create3_sim/blob/humble/irobot_create_common/irobot_create_description/urdf/create3.urdf.xacro#L188
@@ -100,7 +88,13 @@ class RobotState:
         # State data with locks for thread safety
         self._state_lock = Lock()
         self._state = {
-            "battery": {},
+            "battery": {
+                "level": "Unknown",
+                "percentage": None,
+                "voltage": None,
+                "current": None,
+                "status": "Unknown",
+            },
             "dock_status": "Unknown",
             "is_picked_up": None,
             "hazards": [],
@@ -136,11 +130,15 @@ class RobotState:
     def _setup_subscriptions(self):
         """Set up all the ROS topic subscriptions."""
         from rclpy.qos import QoSProfile, ReliabilityPolicy
+
         qos_profile = QoSProfile(reliability=ReliabilityPolicy.BEST_EFFORT, depth=10)
 
         # Hazard detection
         self.node.create_subscription(
-            HazardDetectionVector, "hazard_detection", self._hazard_callback, qos_profile
+            HazardDetectionVector,
+            "hazard_detection",
+            self._hazard_callback,
+            qos_profile,
         )
 
         # Dock status
@@ -166,19 +164,27 @@ class RobotState:
         # Cliff intensity
         # TODO: topic doesn't seem to be publishing in SIM, check real robot
         self.node.create_subscription(
-            IrIntensityVector, "cliff_intensity", self._cliff_intensity_callback, qos_profile
+            IrIntensityVector,
+            "cliff_intensity",
+            self._cliff_intensity_callback,
+            qos_profile,
         )
 
         # Interface buttons
         self.node.create_subscription(
-            InterfaceButtons, "interface_buttons", self._interface_buttons_callback, qos_profile
+            InterfaceButtons,
+            "interface_buttons",
+            self._interface_buttons_callback,
+            qos_profile,
         )
 
         # IMU data
         self.node.create_subscription(Imu, "imu", self._imu_callback, qos_profile)
 
         # Odometry data
-        self.node.create_subscription(Odometry, "odom", self._odometry_callback, qos_profile)
+        self.node.create_subscription(
+            Odometry, "odom", self._odometry_callback, qos_profile
+        )
 
         # Stop status
         self.node.create_subscription(
@@ -229,14 +235,22 @@ class RobotState:
         with self._state_lock:
             percentage = int(msg.percentage * 100)
 
+            # Determine battery status based on current flow
+            current = msg.current
+            if current < -0.05:
+                charging_status = "Discharging"
+            elif current > 0.05:
+                charging_status = "Charging"
+            else:
+                charging_status = "Idle"
+
             # Store battery state information
-            # TODO: Battery power_supply_status always 0 (unknown) in simulation. Check real robot.
             self._state["battery"] = {
                 "level": f"{percentage}%",
                 "percentage": percentage,
                 "voltage": msg.voltage,
-                "current": msg.current,
-                "status": POWER_SUPPLY_STATUS.get(msg.power_supply_status, "Unknown"),
+                "current": current,
+                "status": charging_status,
             }
 
         self._notify_update()

@@ -30,13 +30,13 @@ def get_battery_status() -> str:
 
         response = f"Battery level: {battery_level}, Status: {status}"
 
-        # Warn if battery is low (<20%) and not charging or full
+        # Warn if battery is low (<20%) and not charging
         if (
             isinstance(percentage, (int, float))
             and percentage < 20
-            and status not in ("Charging", "Full")
+            and status != "Charging"
         ):
-            response += "\n ⚠️ Battery level is low! Consider docking the robot soon."
+            response += f"\n ⚠️ Battery level is low at {percentage}%! Consider docking the robot soon."
 
         return response
     except Exception as e:

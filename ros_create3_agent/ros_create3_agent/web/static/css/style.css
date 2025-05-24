@@ -320,16 +320,8 @@ body {
   background-color: var(--muted-gray);
 }
 
-.battery-status-NotCharging {
+.battery-status-Idle {
   background-color: var(--warning-orange);
-}
-
-.battery-status-Full {
-  background-color: var(--success-green);
-}
-
-.battery-status-Unknown {
-  background-color: var(--medium-text);
 }
 
 .battery-details {

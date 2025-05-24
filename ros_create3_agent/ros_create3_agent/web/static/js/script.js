@@ -79,8 +79,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // Update battery voltage and current (2 decimal places)
         const batteryVoltage = document.getElementById('battery-voltage');
         const batteryCurrent = document.getElementById('battery-current');
-        const voltage = battery.voltage !== undefined ? battery.voltage.toFixed(2) : "0.00";
-        const current = battery.current !== undefined ? battery.current.toFixed(2) : "0.00";
+        const voltage = battery.voltage !== null ? battery.voltage.toFixed(2) : "0.00";
+        const current = battery.current !== null ? battery.current.toFixed(2) : "0.00";
         batteryVoltage.textContent = `${voltage} V`;
         batteryCurrent.textContent = `${current} A`;
 
