@@ -22,6 +22,7 @@ from .core.docking import (
     dock_robot,
     undock_robot,
     check_dock_status,
+    return_to_dock,
 )
 from .core.info import (
     agent_intro,

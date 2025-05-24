@@ -17,6 +17,7 @@ from irobot_create_msgs.msg import (
     IrIntensityVector,
     InterfaceButtons,
     StopStatus,
+    IrOpcode,
 )
 from sensor_msgs.msg import BatteryState, Imu
 from nav_msgs.msg import Odometry
@@ -101,7 +102,16 @@ class RobotState:
         self._state_lock = Lock()
         self._state = {
             "battery": {},
-            "dock_status": "Unknown",
+            "dock_status": {
+                "is_docked": False,
+                "dock_visible": False,
+                "status": "Unknown"
+            },
+            "ir_opcode": {
+                "opcode": 0,
+                "sensor": 0,
+                "timestamp": None
+            },
             "is_picked_up": None,
             "hazards": [],
             "ir_intensities": {},
@@ -146,6 +156,11 @@ class RobotState:
         # Dock status
         self.node.create_subscription(
             DockStatus, "dock_status", self._dock_status_callback, qos_profile
+        )
+
+        # IR opcode detection (for dock signals)
+        self.node.create_subscription(
+            IrOpcode, "ir_opcode", self._ir_opcode_callback, qos_profile
         )
 
         # Battery state
@@ -220,7 +235,11 @@ class RobotState:
     def _dock_status_callback(self, msg: DockStatus) -> None:
         """Callback for dock status messages."""
         with self._state_lock:
-            self._state["dock_status"] = "Docked" if msg.is_docked else "Undocked"
+            self._state["dock_status"] = {
+                "is_docked": msg.is_docked,
+                "dock_visible": msg.dock_visible,
+                "status": "Docked" if msg.is_docked else "Undocked"
+            }
 
         self._notify_update()
 
@@ -398,6 +417,17 @@ class RobotState:
         """Callback for stop status messages."""
         with self._state_lock:
             self._state["stop_status"] = {"is_stopped": msg.is_stopped}
+
+        self._notify_update()
+
+    def _ir_opcode_callback(self, msg: IrOpcode) -> None:
+        """Callback for IR opcode messages (dock beacon signals)."""
+        with self._state_lock:
+            self._state["ir_opcode"] = {
+                "opcode": msg.opcode,
+                "sensor": msg.sensor,
+                "timestamp": msg.header.stamp
+            }
 
         self._notify_update()
 

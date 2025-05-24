@@ -5,7 +5,7 @@ https://iroboteducation.github.io/create3_docs/api/ros2/
 """
 
 # Re-export core functionality
-from .docking import dock_robot, undock_robot, check_dock_status
+from .docking import dock_robot, undock_robot, check_dock_status, return_to_dock
 from .info import (
     agent_intro,
     get_help,

@@ -86,7 +86,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         // Update dock status
-        dockStatus.textContent = status.dock_status;
+        const dockStatusText = typeof status.dock_status === 'string' 
+            ? status.dock_status 
+            : status.dock_status.status || 'Unknown';
+        dockStatus.textContent = dockStatusText;
 
 
         // Update hazards list

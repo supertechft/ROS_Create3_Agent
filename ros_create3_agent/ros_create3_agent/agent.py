@@ -56,6 +56,7 @@ class Create3AgentNode(Node, ROSA):
                 tools.dock_robot,
                 tools.undock_robot,
                 tools.check_dock_status,
+                tools.return_to_dock,
                 # Info
                 tools.agent_intro,
                 tools.get_help,
