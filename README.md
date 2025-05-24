@@ -1,4 +1,4 @@
-> This branch is to enhance the docking ability by integgenitly navigating to the dock using the IR sensors and thier op codes: https://iroboteducation.github.io/create3_docs/api/docking/#docking-sensor-data
+> This branch is to enhance the docking ability by intelligently navigating to the dock using the IR sensors and their op codes: https://iroboteducation.github.io/create3_docs/api/docking/#docking-sensor-data
 
 
 # ROS Create 3 Agent
