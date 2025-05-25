@@ -95,10 +95,7 @@ class RobotState:
                 "current": None,
                 "status": "Unknown",
             },
-            "dock_status": {
-                "is_docked": None,
-                "dock_visible": None
-            },
+            "dock_status": {"is_docked": None, "dock_visible": None},
             "is_picked_up": None,
             "hazards": [],
             "ir_intensities": {},
@@ -200,8 +197,7 @@ class RobotState:
             hazard_details = []
             for detection in msg.detections:
                 # Skip hazards with frame_id "base_link"
-                # TODO: Seems to always have a HAZARD_TYPES value of 0 (BACKUP_LIMIT)
-                # TODO: Check real robot
+                # TODO: Seems to always have a HAZARD_TYPES value of 0 (BACKUP_LIMIT) (Check real robot)
                 if detection.header.frame_id == "base_link":
                     continue
 
@@ -231,7 +227,7 @@ class RobotState:
         with self._state_lock:
             self._state["dock_status"] = {
                 "is_docked": msg.is_docked,
-                "dock_visible": msg.dock_visible
+                "dock_visible": msg.dock_visible,
             }
 
         self._notify_update()
@@ -240,6 +236,25 @@ class RobotState:
         """Callback for battery state messages."""
         with self._state_lock:
             percentage = int(msg.percentage * 100)
+
+            # Notify if battery is low (<20%), but not more than once every 5 minutes
+            if percentage < 20:
+                current_time = time.time()
+                last_low_battery_time = getattr(
+                    self, "_last_low_battery_notification_time", 0
+                )
+                if current_time - last_low_battery_time > 300:  # 5 minutes
+                    self._last_low_battery_notification_time = current_time
+                    try:
+                        from ros_create3_agent.web.app import add_robot_message
+
+                        add_robot_message(
+                            "🤖⚠️ Battery low: " + str(percentage) + "% remaining!"
+                        )
+                    except Exception as e:
+                        self.node.get_logger().error(
+                            f"Error sending low battery message: {e}"
+                        )
 
             # Determine battery status based on current flow
             current = msg.current
@@ -272,15 +287,21 @@ class RobotState:
             current_time = time.time()
             last_notification_time = getattr(self, "_last_pickup_notification_time", 0)
 
-            # Determine if we should notify (once every 3 seconds)
+            # Determine if we should notify (once every 5 seconds)
             should_notify = (
                 not was_picked_up
                 and is_picked_up
-                and (current_time - last_notification_time > 3.0)
+                and (current_time - last_notification_time > 5.0)
             )
 
             if should_notify:
                 self._last_pickup_notification_time = current_time
+                try:
+                    from ros_create3_agent.web.app import add_robot_message
+
+                    add_robot_message("🤖 I'm being picked up!")
+                except Exception as e:
+                    self.node.get_logger().error(f"Error sending pickup message: {e}")
 
         self._notify_update()
 
@@ -335,19 +356,19 @@ class RobotState:
                 from ros_create3_agent.web.app import add_robot_message
 
                 try:
-                    add_robot_message("button_1 pressed")
+                    add_robot_message("🤖 Button 1 pressed")
                 except Exception as e:
                     self.node.get_logger().error(f"Error sending button message: {e}")
 
             if not prev_button_power and msg.button_power.is_pressed:
                 try:
-                    add_robot_message("button_power pressed")
+                    add_robot_message("🤖 Button Power pressed")
                 except Exception as e:
                     self.node.get_logger().error(f"Error sending button message: {e}")
 
             if not prev_button_2 and msg.button_2.is_pressed:
                 try:
-                    add_robot_message("button_2 pressed")
+                    add_robot_message("🤖 Button 2 pressed")
                 except Exception as e:
                     self.node.get_logger().error(f"Error sending button message: {e}")
 
