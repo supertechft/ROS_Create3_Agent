@@ -122,9 +122,9 @@ Similar to `setup.sh`, `launch.sh` accepts `--ros-distro`, `--venv-path`, and `-
 - Create3 [ROS 2 documentation](https://iroboteducation.github.io/create3_docs/).
 - Use [iRobot Create 3 Simulator](https://github.com/iRobotEducation/create3_sim) for testing.
 - Follow [ROS 2 Tutorials](https://docs.ros.org/en/humble/Tutorials.html).
-- **Chat history** is managed by a custom Python list in `web/app.py` (not by ROSA)
-- **Robot state** is updated via callback and shown in the web UI
-- **All code is modular and extensible** for new robot actions or LLM integrations
+  - Consider adding the `--symlink-install` flag to `colcon build` to speed up development (see [humble docs](https://docs.ros.org/en/humble/Tutorials/Beginner-Client-Libraries/Colcon-Tutorial.html#build-the-workspace)).
+- Chat history is managed by a custom Python list in `web/app.py` (not by ROSA)
+- Robot state is updated via callback and shown in the web UI `script.js`.
 
 ---
 
