@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const chatMessages = document.getElementById('chat-messages');
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-button');
+    const audioButton = document.getElementById('audio-button');
     const batteryLevel = document.getElementById('battery-level');
     const dockStatus = document.getElementById('dock-status');
     const hazardsList = document.getElementById('hazards-list');
@@ -26,6 +27,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Event listeners for sending messages
     sendButton.addEventListener('click', sendMessage);
+    audioButton.addEventListener('click', function() {
+        sendMessage(true);
+    });
     messageInput.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') sendMessage();
     });
@@ -282,12 +286,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     // Send a user message to the server and update UI on response
-    function sendMessage() {
-        const message = messageInput.value.trim();
+    function sendMessage(audio = false) {
+        const message = (audio) ? "audio" : messageInput.value.trim();
         if (!message) return;
 
         // Disable input while waiting for server response
         messageInput.disabled = true;
+        audioButton.disabled = true;
+        audioButton.classList.add('disabled');
         sendButton.disabled = true;
         sendButton.classList.add('disabled');
         messageInput.value = '';
@@ -304,6 +310,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 updateRobotStatus(data.status);
                 // Re-enable input after response
                 messageInput.disabled = false;
+                audioButton.disabled = false;
+                audioButton.classList.remove('disabled');
                 sendButton.disabled = false;
                 sendButton.classList.remove('disabled');
                 messageInput.focus();
@@ -311,6 +319,8 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => {
                 console.error('Error sending message:', error);
                 messageInput.disabled = false;
+                audioButton.disabled = false;
+                audioButton.classList.remove('disabled');
                 sendButton.disabled = false;
                 sendButton.classList.remove('disabled');
             });

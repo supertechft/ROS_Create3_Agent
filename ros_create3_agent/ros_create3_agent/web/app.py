@@ -86,7 +86,6 @@ def _run_flask_app() -> None:
 
 def _process_user_input(user_input: str) -> str:
     logger.info(f"Processing command via web: {user_input}")
-    _add_user_message(user_input)  # Add user message to chat history
     try:
         # Check if the user input is an audio command
         if user_input.lower().strip() == "audio":
@@ -104,6 +103,7 @@ def _process_user_input(user_input: str) -> str:
                 response = "I couldn't hear anything or understand what was said. Please try again."
         else:
             # Regular text input processing
+            _add_user_message(user_input)  # Add user message to chat history
             response = rosa.invoke(user_input)
             
         _add_agent_message(response)
