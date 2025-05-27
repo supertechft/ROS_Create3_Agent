@@ -1,8 +1,11 @@
 :root {
   --primary-blue: #4a69bd;
   --primary-blue-dark: #3c5aa6;
+  --crimson-red: #dc143c;
+  --cardinal-red: #c41e3a;
   --light-gray: #f0f0f0;
   --lighter-gray: #f9f9f9;
+  --gray: #808080;
   --danger-red: #e74c3c;
   --warning-orange: #f39c12;
   --purple: #9b59b6;
@@ -91,6 +94,23 @@ body {
   background-color: var(--primary-blue);
   color: white;
   border-bottom-right-radius: 5px;
+  position: relative;
+  margin-right: 35px;
+}
+
+.user::after {
+  content: "";
+  position: absolute;
+  right: -45px;
+  bottom: 0px;
+  width: 30px;
+  height: 30px;
+  background-color: var(--gray);
+  background-image: url('../assets/images/user.svg');
+  background-size: cover;
+  background-position: center;
+  border: 2px solid var(--gray);
+  border-radius: 50%;
 }
 
 .agent {
@@ -98,6 +118,23 @@ body {
   background-color: var(--light-gray);
   color: var(--dark-text);
   border-bottom-left-radius: 5px;
+  position: relative;
+  margin-left: 35px;
+}
+
+.agent::before {
+  content: "";
+  position: absolute;
+  left: -45px;
+  bottom: 0px;
+  width: 30px;
+  height: 30px;
+  background-color: black;
+  background-image: url('../assets/images/agent.svg');
+  background-size: cover;
+  background-position: center;
+  border: 2px solid black;
+  border-radius: 50%;
 }
 
 .agent p {
@@ -160,6 +197,23 @@ body {
   background-color: #e67e22;
   color: white;
   border-bottom-left-radius: 5px;
+  position: relative;
+  margin-left: 35px;
+}
+
+.robot::before {
+  content: "";
+  position: absolute;
+  left: -45px;
+  bottom: 0px;
+  width: 30px;
+  height: 30px;
+  background-color: orange;
+  background-image: url('../assets/images/robot.svg');
+  background-size: cover;
+  background-position: center;
+  border: 2px solid orange;
+  border-radius: 50%;
 }
 
 .chat-input {
@@ -178,7 +232,6 @@ body {
 }
 
 .chat-input button {
-  background-color: var(--primary-blue);
   color: white;
   border: none;
   border-radius: 25px;
@@ -189,8 +242,21 @@ body {
   transition: background-color 0.2s;
 }
 
-.chat-input button:hover {
+.chat-input #send-button {
+  background-color: var(--primary-blue);
+}
+
+.chat-input #send-button:hover {
   background-color: var(--primary-blue-dark);
+}
+
+.chat-input #audio-button {
+  background-color: var(--crimson-red);
+  padding: 10px 10px;
+}
+
+.chat-input #audio-button:hover {
+  background-color: var(--cardinal-red);
 }
 
 .chat-input button.disabled,

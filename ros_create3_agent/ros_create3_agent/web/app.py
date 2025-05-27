@@ -96,7 +96,6 @@ def _process_user_input(user_input: str) -> str:
     This function adds the message to chat history and offloads LLM processing to a background thread.
     """
     logger.info(f"Processing command via web: {user_input}")
-    _add_user_message(user_input)  # Add user message to chat history
     # Using shared thread pool to prevent blocking the Flask thread
     run_in_executor(_process_user_input_background, user_input)
     return "Processing command... (results will appear in chat)"
@@ -125,6 +124,7 @@ def _process_user_input_background(user_input: str):
                 response = "I couldn't hear anything or understand what was said. Please try again."
         else:
             # Regular text input processing - this can take time due to LLM API calls
+            _add_user_message(user_input)  # Add user message to chat history
             response = rosa.invoke(user_input)
             
         _add_agent_message(response)

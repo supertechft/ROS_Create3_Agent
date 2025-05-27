@@ -45,26 +45,26 @@ def _check_dock_visibility_and_warn(dock_visible, operation="dock"):
     """Check visibility and warn."""
     if dock_visible is False:
         warning_msg = f"⚠️ Dock is not visible to robot sensors. {operation.capitalize()}ing may fail."
-        web.add_robot_message(f"🤖 {warning_msg}")
+        web.add_robot_message(f"{warning_msg}")
         _get_node().get_logger().warn(
             f"Dock not visible, attempting to {operation} anyway"
         )
     elif dock_visible is None:
         warning_msg = f"⚠️ Dock visibility unknown. Proceeding with {operation} attempt."
-        web.add_robot_message(f"🤖 {warning_msg}")
+        web.add_robot_message(f"{warning_msg}")
 
 
 def _execute_dock_action(action_client, goal, action_name):
     """Execute dock action in a thread pool."""
     _get_node().get_logger().info(f"{action_name}...")
-    web.add_robot_message(f"🤖 Attempting to {action_name.lower()}...")
+    web.add_robot_message(f"Attempting to {action_name.lower()}...")
 
     future = action_client.send_goal_async(goal)
     spin_until_complete_in_executor(_get_node(), future).result()
     goal_handle = future.result()
 
     if not goal_handle.accepted:
-        web.add_robot_message(f"🤖 {action_name} goal was rejected")
+        web.add_robot_message(f"{action_name} goal was rejected")
         return False
 
     result_future = goal_handle.get_result_async()
@@ -113,11 +113,11 @@ def _verify_operation_result(expected_docked_state, operation, robot_state):
 
     if final_is_docked == expected_docked_state:
         result_message = f"Robot successfully {operation}ed"
-        web.add_robot_message(f"🤖 ✅ {result_message}")
+        web.add_robot_message(f"✅ {result_message}")
     else:
         status = _get_status_message(include_details=False)
         result_message = f"{operation.capitalize()} command completed, but robot is {status}. Please verify {operation}ing manually."
-        web.add_robot_message(f"🤖 ⚠️ {result_message}")
+        web.add_robot_message(f"⚠️ {result_message}")
 
     return result_message
 
@@ -140,7 +140,7 @@ def dock_robot() -> str:
         # Check if already docked
         if is_docked:
             message = "Robot is already docked"
-            web.add_robot_message(f"🤖 {message}")
+            web.add_robot_message(f"{message}")
             return message
 
         # Check dock visibility and warn if needed
@@ -156,7 +156,7 @@ def dock_robot() -> str:
 
     except Exception as e:
         error_message = f"Error while attempting to dock: {e}"
-        web.add_robot_message(f"🤖 ❌ {error_message}")
+        web.add_robot_message(f"❌ {error_message}")
         return error_message
 
 
@@ -178,7 +178,7 @@ def undock_robot() -> str:
         # Check if robot is already undocked
         if not is_docked:
             message = "Robot is already undocked"
-            web.add_robot_message(f"🤖 {message}")
+            web.add_robot_message(f"{message}")
             return message
 
         # Execute undocking action
@@ -191,7 +191,7 @@ def undock_robot() -> str:
 
     except Exception as e:
         error_message = f"Error while attempting to undock: {e}"
-        web.add_robot_message(f"🤖 ❌ {error_message}")
+        web.add_robot_message(f"❌ {error_message}")
         return error_message
 
 

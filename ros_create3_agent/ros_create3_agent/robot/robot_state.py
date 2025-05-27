@@ -232,12 +232,12 @@ class RobotState:
                             from ros_create3_agent.web.app import add_robot_message
 
                             if hazard_name == "BUMP":
-                                add_robot_message("🤖 Ouch! I bumped into something.")
+                                add_robot_message("Ouch! I bumped into something.")
                             elif hazard_name == "CLIFF":
-                                add_robot_message("🤖 Whoa! I see a cliff or drop-off!")
+                                add_robot_message("Whoa! I see a cliff or drop-off!")
                             elif hazard_name == "STALL":
                                 add_robot_message(
-                                    "🤖 Help! I'm trapped and can't move!"
+                                    "Help! I'm trapped and can't move!"
                                 )
                         except Exception as e:
                             self.node.get_logger().error(
@@ -275,7 +275,7 @@ class RobotState:
                         from ros_create3_agent.web.app import add_robot_message
 
                         add_robot_message(
-                            "🤖⚠️ Battery low: " + str(percentage) + "% remaining!"
+                            "⚠️ Battery low: " + str(percentage) + "% remaining!"
                         )
                     except Exception as e:
                         self.node.get_logger().error(
@@ -325,7 +325,7 @@ class RobotState:
                 try:
                     from ros_create3_agent.web.app import add_robot_message
 
-                    add_robot_message("🤖 I'm being picked up!")
+                    add_robot_message("I'm being picked up!")
                 except Exception as e:
                     self.node.get_logger().error(f"Error sending pickup message: {e}")
 
@@ -382,19 +382,19 @@ class RobotState:
 
             if not prev_button_1 and msg.button_1.is_pressed:
                 try:
-                    add_robot_message("🤖 Button 1 pressed")
+                    add_robot_message("Button 1 pressed")
                 except Exception as e:
                     self.node.get_logger().error(f"Error sending button message: {e}")
 
             if not prev_button_power and msg.button_power.is_pressed:
                 try:
-                    add_robot_message("🤖 Button Power pressed")
+                    add_robot_message("Button Power pressed")
                 except Exception as e:
                     self.node.get_logger().error(f"Error sending button message: {e}")
 
             if not prev_button_2 and msg.button_2.is_pressed:
                 try:
-                    add_robot_message("🤖 Button 2 pressed")
+                    add_robot_message("Button 2 pressed")
                 except Exception as e:
                     self.node.get_logger().error(f"Error sending button message: {e}")
 
