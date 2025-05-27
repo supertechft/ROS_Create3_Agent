@@ -66,15 +66,15 @@ def initialize(node: Node, ros_agent) -> None:
     global rosa, robot_state
     rosa = ros_agent
     robot_state = get_robot_state(node)
-    
+
     # Initialize chat with welcome message
     welcome_msg = "Welcome to the Create 3 Robot Assistant. How can I help you today?"
     _add_agent_message(welcome_msg)
-    
+
     # Start Flask server in background thread
     web_thread = threading.Thread(target=_run_flask_app, daemon=True)
     web_thread.start()
-    
+
     # Give Flask time to start before opening browser
     time.sleep(2)
     webbrowser.open(f"http://localhost:{WEB_PORT}")
@@ -91,14 +91,13 @@ def _run_flask_app() -> None:
     app.run(host="0.0.0.0", port=WEB_PORT, threaded=True, debug=False)
 
 
-def _process_user_input(user_input: str) -> str:
+def _process_user_input(user_input: str) -> None:
     """
     This function adds the message to chat history and offloads LLM processing to a background thread.
     """
     logger.info(f"Processing command via web: {user_input}")
     # Using shared thread pool to prevent blocking the Flask thread
     run_in_executor(_process_user_input_background, user_input)
-    return "Processing command... (results will appear in chat)"
 
 
 def _process_user_input_background(user_input: str):
@@ -112,7 +111,7 @@ def _process_user_input_background(user_input: str):
         if user_input.lower().strip() == "audio":
             logger.info("Listening for verbal input...")
             _add_agent_message("Listening...")
-            
+
             # Get audio transcription from Rosa
             transcription = rosa.listen()
             if transcription:
@@ -126,7 +125,7 @@ def _process_user_input_background(user_input: str):
             # Regular text input processing - this can take time due to LLM API calls
             _add_user_message(user_input)  # Add user message to chat history
             response = rosa.invoke(user_input)
-            
+
         _add_agent_message(response)
     except Exception as e:
         error_msg = f"Error processing command: {str(e)}"
@@ -153,12 +152,11 @@ def post_message():
         return jsonify({"error": "Invalid request"}), 400
 
     user_input = request.json["message"]
-    response = _process_user_input(user_input)
+    _process_user_input(user_input)
 
     return jsonify(
         {
             "history": _get_chat_history(),
             "status": robot_state.get_state(),
-            "response": response,
         }
     )
