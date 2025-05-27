@@ -206,11 +206,11 @@ body {
   bottom: 0px;
   width: 30px;
   height: 30px;
-  background-color: #808080;
+  background-color: var(--gray);
   background-image: url('../assets/images/robot.svg');
   background-size: cover;
   background-position: center;
-  border: 2px solid #808080;
+  border: 2px solid var(--gray);
   border-radius: 50%;
 }
 
