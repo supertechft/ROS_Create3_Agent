@@ -56,7 +56,7 @@ def drive_distance(distance: float) -> str:
         # Safety check: Ensure no hazards before moving
         hazard_result = check_hazards.invoke({})
         if hazard_result.startswith("⚠️ Hazards detected:"):
-            web.add_robot_message(f"🤖 Cannot move due to hazards. {hazard_result}")
+            web.add_robot_message(f"Cannot move due to hazards. {hazard_result}")
             return f"Movement canceled: {hazard_result}"
 
         # Send the drive goal
@@ -64,21 +64,21 @@ def drive_distance(distance: float) -> str:
         goal.distance = distance
         _get_node().get_logger().info(f"Moving {distance} meters...")
         direction = "forward" if distance > 0 else "backward"
-        web.add_robot_message(f"🤖 Moving {abs(distance):.2f} meters {direction}...")
+        web.add_robot_message(f"Moving {abs(distance):.2f} meters {direction}...")
         future = _get_drive_distance_client().send_goal_async(goal)
         rclpy.spin_until_future_complete(_get_node(), future)
         goal_handle = future.result()
         if not goal_handle.accepted:
-            web.add_robot_message(f"🤖 Move distance goal was rejected")
+            web.add_robot_message(f"Move distance goal was rejected")
             return "Move distance goal was rejected"
         result_future = goal_handle.get_result_async()
         rclpy.spin_until_future_complete(_get_node(), result_future)
         result_message = f"Finished moving {abs(distance):.2f} meters {direction}"
-        web.add_robot_message(f"🤖 {result_message}")
+        web.add_robot_message(f"{result_message}")
         return result_message
     except Exception as e:
         error_message = f"Error while trying to move: {e}"
-        web.add_robot_message(f"🤖 {error_message}")
+        web.add_robot_message(f"{error_message}")
         return error_message
 
 
@@ -103,7 +103,7 @@ def rotate_angle(angle_degrees: float) -> str:
         # Safety check: Ensure no hazards before rotating
         hazard_result = check_hazards.invoke({})
         if hazard_result.startswith("⚠️ Hazards detected:"):
-            web.add_robot_message(f"🤖 Cannot rotate due to hazards. {hazard_result}")
+            web.add_robot_message(f"Cannot rotate due to hazards. {hazard_result}")
             return f"Rotation canceled: {hazard_result}"
 
         # Prepare and send the rotate goal
@@ -113,22 +113,22 @@ def rotate_angle(angle_degrees: float) -> str:
         direction = "counterclockwise" if angle_degrees > 0 else "clockwise"
         _get_node().get_logger().info(f"Rotating {angle_degrees} degrees...")
         web.add_robot_message(
-            f"🤖 Rotating {abs(angle_degrees):.2f} degrees {direction}..."
+            f"Rotating {abs(angle_degrees):.2f} degrees {direction}..."
         )
         future = _get_rotate_angle_client().send_goal_async(goal)
         rclpy.spin_until_future_complete(_get_node(), future)
         goal_handle = future.result()
         if not goal_handle.accepted:
-            web.add_robot_message(f"🤖 Failed to rotate: goal rejected")
+            web.add_robot_message(f"Failed to rotate: goal rejected")
             return "Rotate angle goal was rejected"
         result_future = goal_handle.get_result_async()
         rclpy.spin_until_future_complete(_get_node(), result_future)
         result_message = (
             f"Finished rotating {abs(angle_degrees):.2f} degrees {direction}"
         )
-        web.add_robot_message(f"🤖 {result_message}")
+        web.add_robot_message(f"{result_message}")
         return result_message
     except Exception as e:
         error_message = f"Error while trying to rotate: {e}"
-        web.add_robot_message(f"🤖 {error_message}")
+        web.add_robot_message(f"{error_message}")
         return error_message
