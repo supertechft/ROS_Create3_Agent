@@ -54,7 +54,7 @@ def drive_distance(distance: float) -> str:
             return "Invalid distance parameter. Must be a number."
 
         # Safety check: Ensure no hazards before moving
-        hazard_result = check_hazards.invoke({})
+        hazard_result = check_hazards.invoke({"include_ir_sensors": True})
         if hazard_result.startswith("⚠️ Hazards detected:"):
             web.add_robot_message(f"🤖 Cannot move due to hazards. {hazard_result}")
             return f"Movement canceled: {hazard_result}"
@@ -101,7 +101,7 @@ def rotate_angle(angle_degrees: float) -> str:
             return "Invalid angle_degrees parameter. Must be a number."
 
         # Safety check: Ensure no hazards before rotating
-        hazard_result = check_hazards.invoke({})
+        hazard_result = check_hazards.invoke({"include_ir_sensors": False})
         if hazard_result.startswith("⚠️ Hazards detected:"):
             web.add_robot_message(f"🤖 Cannot rotate due to hazards. {hazard_result}")
             return f"Rotation canceled: {hazard_result}"
