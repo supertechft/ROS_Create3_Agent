@@ -244,7 +244,6 @@ body {
 
 .chat-input #send-button {
   background-color: var(--primary-blue);
-  
 }
 
 .chat-input #send-button:hover {
@@ -252,7 +251,7 @@ body {
 }
 
 .chat-input #audio-button {
-  background-color:	var(--crimson-red);
+  background-color: var(--crimson-red);
   padding: 10px 10px;
 }
 
