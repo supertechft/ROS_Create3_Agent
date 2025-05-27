@@ -126,6 +126,23 @@ Similar to `setup.sh`, `launch.sh` accepts `--ros-distro`, `--venv-path`, and `-
 - Chat history is managed by a custom Python list in `web/app.py` (not by ROSA)
 - Robot state is updated via callback and shown in the web UI `script.js`.
 
+### Threading and Concurrency Architecture
+
+This project uses both Python's `threading` and `concurrent.futures` modules to keep the ROS node, web server, and long-running tasks responsive and non-blocking:
+
+- The ROS 2 node is continuously spun in a background thread (see `agent.py`), ensuring ROS callbacks (like robot state updates) are always processed, even while the web server or other tasks are running.
+- The Flask web server runs in its own thread, serving the dashboard and API endpoints independently from ROS spinning.
+- The `ros_create3_agent/utils/ros_threading.py` module defines two `ThreadPoolExecutor` pools:
+  - One for blocking ROS operations (e.g., `rclpy.spin_until_future_complete`), used in robot tool implementations like movement and docking.
+  - One for general background tasks (such as LLM calls), used to offload long-running computations from the main thread.
+- All blocking or long-running operations (robot actions, LLM calls) are executed in these thread pools, so the dashboard remains live and robot state updates are always processed in real time.
+
+**Why both are needed:**
+- `threading` is ideal for persistent background loops (like spinning the ROS node or running the Flask server).
+- `concurrent.futures` is best for managing pools of short-lived or concurrent tasks (like robot actions and LLM processing).
+
+This combination ensures the agent can process ROS events, serve the web dashboard, and handle user commands all at the same time, without freezing or blocking.
+
 ---
 
 ## Project Structure
@@ -142,9 +159,11 @@ ros_create3_agent/
 │   ├── agent.py                    # Main ROS agent node
 │   ├── llm/                        # Language model integration (OpenAI, HF, prompts)
 │   ├── robot/                      # Robot state, tools, and core actions
-│   │   ├── core/                   # Movement, docking, sensing modules
+│   │   ├── core/                   # Tool implementations: movement, docking, sensing 
 │   │   ├── robot_state.py          # Robot state manager
 │   │   ├── tools.py                # Robot action tool registry
+│   ├── utils/                      # Shared utilities (threading, executors, etc.)
+│   │   └── ros_threading.py        # Thread pools for ROS and LLM/background tasks
 │   ├── web/                        # Web server and UI
 │   │   ├── app.py                  # Flask app and chat system
 │   │   ├── static/                 # JS/CSS assets
