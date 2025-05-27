@@ -44,14 +44,17 @@ def get_battery_status() -> str:
 
 
 @tool
-def check_hazards() -> str:
+def check_hazards(include_ir_sensors: bool = False) -> str:
     """
-    Check for any hazards detected by the robot, including proximity hazards.
+    Check for any hazards detected by the robot, optionally including proximity hazards.
+
+    Args:
+        include_ir_sensors (bool): Whether to include IR sensor proximity as hazards. Defaults to False.
 
     Returns:
         str: A message describing any detected hazards or confirming the path is clear.
 
-    Combines hazards reported by the robot's sensors with a synthetic hazard if any IR proximity sensor detects an object very close (intensity > 50).
+    Combines hazards reported by the robot's sensors with any proximity hazards picked up by IR proximity sensors (intensity > 50) if include_ir_sensors is True.
     """
     try:
         # Get hazard and IR sensor state
@@ -59,17 +62,18 @@ def check_hazards() -> str:
         hazards = state.get("hazards", [])
         ir_intensities = state.get("ir_intensities", {})
 
-        proximity_threshold = 50  # Threshold for proximity hazard
+        proximity_threshold = 1000  # Threshold for proximity hazard
         proximity_hazards = []
-        for sensor, value in ir_intensities.items():
-            if value > proximity_threshold:
-                proximity_hazards.append(
-                    {
-                        "type": "OBJECT_PROXIMITY",
-                        "description": f"Object detected very close by IR sensor: {sensor}",
-                        "location": sensor,
-                    }
-                )
+        if include_ir_sensors:
+            for sensor, value in ir_intensities.items():
+                if value > proximity_threshold:
+                    proximity_hazards.append(
+                        {
+                            "type": "OBJECT_PROXIMITY",
+                            "description": f"Object detected very close by IR sensor: {sensor}",
+                            "location": sensor,
+                        }
+                    )
         all_hazards = hazards + proximity_hazards
         if all_hazards:
             hazard_messages = []

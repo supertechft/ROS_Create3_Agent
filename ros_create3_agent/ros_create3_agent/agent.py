@@ -89,12 +89,33 @@ class Create3AgentNode(Node, ROSA):
         app.initialize(self, self)  # Pass self as both the node and the ROSA agent
         logger.info("Web interface started")
 
+    def spin_node_in_background(self):
+        """
+        Start spinning the ROS node in a background thread.
+
+        This is essential for the web interface to work properly.
+        ROS callbacks are processed even when the main thread is busy serving HTTP requests.
+        """
+        import threading
+
+        def _spin_node():
+            while self.running and rclpy.ok():
+                try:
+                    rclpy.spin_once(self, timeout_sec=0.1)
+                except Exception as e:
+                    logger.error(f"Error in background node spinning: {e}")
+
+        spin_thread = threading.Thread(target=_spin_node, daemon=True)
+        spin_thread.start()
+        logger.info("Background ROS node spinning started")
+
 
 # Main function to start the Create 3 ROS agent
 def main():
     try:
         # Set up logging at the start
         from ros_create3_agent.logging import set_loggers
+        from rclpy.executors import SingleThreadedExecutor
 
         # Configure external libraries for quiet logging (WARNING level) and internal modules for INFO
         set_loggers("external", "WARNING")  # Set external libraries to WARNING
@@ -104,9 +125,10 @@ def main():
         agent = Create3AgentNode()
         agent.initialize_web_interface()
 
-        # Set up executor for ROS callbacks
-        from rclpy.executors import SingleThreadedExecutor
+        # Start background spinning for web interface
+        agent.spin_node_in_background()
 
+        # Set up executor for ROS callbacks
         executor = SingleThreadedExecutor()
         executor.add_node(agent)
 
@@ -121,6 +143,7 @@ def main():
     finally:
         print("\nCleaning up and shutting down...")
         try:
+            # Clean up agent resources
             if "agent" in locals():
                 agent.running = False
                 agent.destroy_node()
@@ -128,6 +151,15 @@ def main():
             print(f"Error during cleanup: {e}")
 
         try:
+            # Shutdown all thread pools
+            from ros_create3_agent.utils.ros_threading import shutdown_executors
+
+            shutdown_executors()
+        except Exception as e:
+            print(f"Error shutting down thread pools: {e}")
+
+        try:
+            # Shutdown ROS
             if rclpy.ok():
                 rclpy.shutdown()
         except Exception as e:

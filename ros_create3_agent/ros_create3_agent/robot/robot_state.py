@@ -378,9 +378,9 @@ class RobotState:
 
             # Check for button press events (transition from not pressed to pressed)
             # Otherwise, we will spam the web app with messages
-            if not prev_button_1 and msg.button_1.is_pressed:
-                from ros_create3_agent.web.app import add_robot_message
+            from ros_create3_agent.web.app import add_robot_message
 
+            if not prev_button_1 and msg.button_1.is_pressed:
                 try:
                     add_robot_message("Button 1 pressed")
                 except Exception as e:

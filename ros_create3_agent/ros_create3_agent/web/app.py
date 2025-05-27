@@ -19,6 +19,7 @@ from rclpy.node import Node
 from ros_create3_agent.robot.robot_state import get_robot_state
 from ros_create3_agent.logging import get_logger
 from ros_create3_agent.rosa_config import WEB_PORT, MAX_CHAT_HISTORY
+from ros_create3_agent.utils.ros_threading import run_in_executor
 
 # Get a logger for this module
 logger = get_logger(__name__)
@@ -65,10 +66,16 @@ def initialize(node: Node, ros_agent) -> None:
     global rosa, robot_state
     rosa = ros_agent
     robot_state = get_robot_state(node)
+    
+    # Initialize chat with welcome message
     welcome_msg = "Welcome to the Create 3 Robot Assistant. How can I help you today?"
     _add_agent_message(welcome_msg)
+    
+    # Start Flask server in background thread
     web_thread = threading.Thread(target=_run_flask_app, daemon=True)
     web_thread.start()
+    
+    # Give Flask time to start before opening browser
     time.sleep(2)
     webbrowser.open(f"http://localhost:{WEB_PORT}")
     logger.info(f"Web interface initialized on http://localhost:{WEB_PORT}")
@@ -85,7 +92,21 @@ def _run_flask_app() -> None:
 
 
 def _process_user_input(user_input: str) -> str:
+    """
+    This function adds the message to chat history and offloads LLM processing to a background thread.
+    """
     logger.info(f"Processing command via web: {user_input}")
+    # Using shared thread pool to prevent blocking the Flask thread
+    run_in_executor(_process_user_input_background, user_input)
+    return "Processing command... (results will appear in chat)"
+
+
+def _process_user_input_background(user_input: str):
+    """
+    Background worker that processes user input through ROSA.
+    Handles both text and audio input and adds responses to chat history.
+    This runs in a separate thread to prevent blocking the Flask server.
+    """
     try:
         # Check if the user input is an audio command
         if user_input.lower().strip() == "audio":
@@ -102,17 +123,15 @@ def _process_user_input(user_input: str) -> str:
                 logger.warning("No speech detected or transcription failed")
                 response = "I couldn't hear anything or understand what was said. Please try again."
         else:
-            # Regular text input processing
+            # Regular text input processing - this can take time due to LLM API calls
             _add_user_message(user_input)  # Add user message to chat history
             response = rosa.invoke(user_input)
             
         _add_agent_message(response)
-        return response
     except Exception as e:
         error_msg = f"Error processing command: {str(e)}"
         logger.error(error_msg)
         _add_agent_message(error_msg)
-        return error_msg
 
 
 @app.route("/")

@@ -9,7 +9,7 @@ from langchain.agents import tool
 from ros_create3_agent.web import app as web
 from ..robot_state import get_robot_state
 from irobot_create_msgs.action import Dock, Undock
-import rclpy
+from ros_create3_agent.utils.ros_threading import spin_until_complete_in_executor
 
 
 # Accessors for shared ROS node and action clients from the tools module.
@@ -55,12 +55,12 @@ def _check_dock_visibility_and_warn(dock_visible, operation="dock"):
 
 
 def _execute_dock_action(action_client, goal, action_name):
-    """Execute dock action."""
+    """Execute dock action in a thread pool."""
     _get_node().get_logger().info(f"{action_name}...")
     web.add_robot_message(f"Attempting to {action_name.lower()}...")
 
     future = action_client.send_goal_async(goal)
-    rclpy.spin_until_future_complete(_get_node(), future)
+    spin_until_complete_in_executor(_get_node(), future).result()
     goal_handle = future.result()
 
     if not goal_handle.accepted:
@@ -68,7 +68,7 @@ def _execute_dock_action(action_client, goal, action_name):
         return False
 
     result_future = goal_handle.get_result_async()
-    rclpy.spin_until_future_complete(_get_node(), result_future)
+    spin_until_complete_in_executor(_get_node(), result_future).result()
 
     return True
 

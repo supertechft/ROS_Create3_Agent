@@ -9,9 +9,9 @@ https://iroboteducation.github.io/create3_docs/api/drive-goals/
 
 from langchain.agents import tool
 import math
-import rclpy
 from irobot_create_msgs.action import DriveDistance, RotateAngle
 from ros_create3_agent.web import app as web
+from ros_create3_agent.utils.ros_threading import spin_until_complete_in_executor
 from .sensing import check_hazards
 
 
@@ -54,7 +54,7 @@ def drive_distance(distance: float) -> str:
             return "Invalid distance parameter. Must be a number."
 
         # Safety check: Ensure no hazards before moving
-        hazard_result = check_hazards.invoke({})
+        hazard_result = check_hazards.invoke({"include_ir_sensors": True})
         if hazard_result.startswith("⚠️ Hazards detected:"):
             web.add_robot_message(f"Cannot move due to hazards. {hazard_result}")
             return f"Movement canceled: {hazard_result}"
@@ -66,13 +66,13 @@ def drive_distance(distance: float) -> str:
         direction = "forward" if distance > 0 else "backward"
         web.add_robot_message(f"Moving {abs(distance):.2f} meters {direction}...")
         future = _get_drive_distance_client().send_goal_async(goal)
-        rclpy.spin_until_future_complete(_get_node(), future)
+        spin_until_complete_in_executor(_get_node(), future).result()
         goal_handle = future.result()
         if not goal_handle.accepted:
             web.add_robot_message(f"Move distance goal was rejected")
             return "Move distance goal was rejected"
         result_future = goal_handle.get_result_async()
-        rclpy.spin_until_future_complete(_get_node(), result_future)
+        spin_until_complete_in_executor(_get_node(), result_future).result()
         result_message = f"Finished moving {abs(distance):.2f} meters {direction}"
         web.add_robot_message(f"{result_message}")
         return result_message
@@ -101,7 +101,7 @@ def rotate_angle(angle_degrees: float) -> str:
             return "Invalid angle_degrees parameter. Must be a number."
 
         # Safety check: Ensure no hazards before rotating
-        hazard_result = check_hazards.invoke({})
+        hazard_result = check_hazards.invoke({"include_ir_sensors": False})
         if hazard_result.startswith("⚠️ Hazards detected:"):
             web.add_robot_message(f"Cannot rotate due to hazards. {hazard_result}")
             return f"Rotation canceled: {hazard_result}"
@@ -116,13 +116,13 @@ def rotate_angle(angle_degrees: float) -> str:
             f"Rotating {abs(angle_degrees):.2f} degrees {direction}..."
         )
         future = _get_rotate_angle_client().send_goal_async(goal)
-        rclpy.spin_until_future_complete(_get_node(), future)
+        spin_until_complete_in_executor(_get_node(), future).result()
         goal_handle = future.result()
         if not goal_handle.accepted:
             web.add_robot_message(f"Failed to rotate: goal rejected")
             return "Rotate angle goal was rejected"
         result_future = goal_handle.get_result_async()
-        rclpy.spin_until_future_complete(_get_node(), result_future)
+        spin_until_complete_in_executor(_get_node(), result_future).result()
         result_message = (
             f"Finished rotating {abs(angle_degrees):.2f} degrees {direction}"
         )
