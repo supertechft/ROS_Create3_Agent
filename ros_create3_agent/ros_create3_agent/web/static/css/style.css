@@ -1,6 +1,8 @@
 :root {
   --primary-blue: #4a69bd;
   --primary-blue-dark: #3c5aa6;
+  --crimson-red: #dc143c;
+  --cardinal-red: #c41e3a;
   --light-gray: #f0f0f0;
   --lighter-gray: #f9f9f9;
   --gray: #808080;
@@ -230,7 +232,6 @@ body {
 }
 
 .chat-input button {
-  background-color: var(--primary-blue);
   color: white;
   border: none;
   border-radius: 25px;
@@ -241,8 +242,22 @@ body {
   transition: background-color 0.2s;
 }
 
-.chat-input button:hover {
+.chat-input #send-button {
+  background-color: var(--primary-blue);
+  
+}
+
+.chat-input #send-button:hover {
   background-color: var(--primary-blue-dark);
+}
+
+.chat-input #audio-button {
+  background-color:	var(--crimson-red);
+  padding: 10px 10px;
+}
+
+.chat-input #audio-button:hover {
+  background-color: var(--cardinal-red);
 }
 
 .chat-input button.disabled,
