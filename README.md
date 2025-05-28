@@ -26,13 +26,14 @@ This project enables natural language control of an [iRobot Create® 3](https://
   - If you have the [iRobot Create® 3](https://edu.irobot.com/what-we-offer/create3), follow [these steps](https://iroboteducation.github.io/create3_docs/setup/provision/) to set it up and connect to the network.
   - Otherwise, the [Create 3 Simulator](https://github.com/iRobotEducation/create3_sim/tree/humble). See [Setup and Build Workspace](#setup-and-build-workspace).
 
-For a full step-by-step environment setup (including a prebuilt VM image), see [this doc](https://docs.google.com/document/d/1ZO-zEPBvO-WpP5zc8WkkO2GKfG2-uJWClost-Xz_afM/edit?usp=sharing).
-
-The script mentioned in the next section sets up the workspace, installs the Create 3 simulator, Create 3 ROS 2 interface, among other things. 
-
 ---
 
 ## Quickstart: Installation & Setup
+
+We tried our best to make the environment setup simple as possible. The script `setup.sh` installs ROS 2, sets up the workspace, installs the Create 3 simulator, Create 3 ROS 2 interface, and all dependencies to run the ROS Create 3 agent.
+
+Alternatively, we've prepared a full step-by-step environment setup guide as well as a prebuilt VM image comes with ROS 2 and Gazebo already installed. [Read the guide here.](https://docs.google.com/document/d/1ZO-zEPBvO-WpP5zc8WkkO2GKfG2-uJWClost-Xz_afM/edit?usp=sharing).
+
 
 1. **Download the setup and launch scripts**:
 
@@ -71,6 +72,8 @@ The script mentioned in the next section sets up the workspace, installs the Cre
 
 ## Running the Agent
 
+You can use the `launch.sh` script to launch the agent with ease, with or without the sim.
+
 ### Launch with Simulation
 
 To start both the Create 3 simulator and the agent:
@@ -84,7 +87,7 @@ To start both the Create 3 simulator and the agent:
 This script
   - Sources all environments (ROS and Python `venv`)
   - Opens two terminals: one for the simulator, one for the agent.
-  - The simulations starts in an empty world.
+  - Starts Create 3 sim (Gazebo Classic) in an empty world.
   - Opens up the web interface which is available at [http://localhost:5000](http://localhost:5000)
 
 Once running, you can issue commands in natural language (e.g., "Drive forward", "Turn left", "Undock").

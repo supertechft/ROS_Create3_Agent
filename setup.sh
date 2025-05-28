@@ -43,13 +43,33 @@ while [[ $# -gt 0 ]]; do
 done
 
 
+# Fix any broken packages
+sudo dpkg --configure -a 
+
+
+# Install Gazebo and Gazebo ROS pkgs if simulation is requested
+if [ "$USE_SIM" == "true" ]; then
+  if ! command -v gazebo &> /dev/null; then
+    echo ""
+    echo "Gazebo not found. Installing Gazebo..."
+    sudo apt update
+    sudo apt install -y gazebo
+  else
+    echo "Gazebo is already installed."
+  fi
+  GAZEBO_ROS_PKGS="ros-$ROS_DISTRO-gazebo-ros-pkgs"
+else
+  GAZEBO_ROS_PKGS=""
+fi
+
+
 # Install ROS 2 if not installed
 if ! command -v ros2 &> /dev/null; then
   echo ""
-  echo "Installing ROS 2 $ROS_DISTRO..."
+  echo "ROS 2 not found. Installing ROS 2 $ROS_DISTRO..."
 
   # Set locale to UTF-8
-  sudo apt update && sudo apt install locales
+  sudo apt install locales
   sudo locale-gen en_US en_US.UTF-8
   sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
   export LANG=en_US.UTF-8
@@ -63,7 +83,7 @@ if ! command -v ros2 &> /dev/null; then
 
   # Install ROS 2
   sudo apt update && sudo apt upgrade -y
-  sudo apt install -y ros-$ROS_DISTRO-desktop ros-dev-tools ros-$ROS_DISTRO-gazebo-ros ros-$ROS_DISTRO-ros2-control
+  sudo apt install -y ros-$ROS_DISTRO-desktop ros-dev-tools $GAZEBO_ROS_PKGS ros-$ROS_DISTRO-ros2-control
 else
   echo ""
   echo "ROS 2 $ROS_DISTRO is already installed."
@@ -81,7 +101,6 @@ source /opt/ros/$ROS_DISTRO/setup.bash
 # Install system dependencies
 echo ""
 echo "Installing system dependencies..."
-sudo dpkg --configure -a
 sudo apt-get update
 sudo apt-get install -y ros-$ROS_DISTRO-irobot-create-msgs portaudio19-dev python3-rosdep python3-colcon-common-extensions
 
@@ -143,6 +162,7 @@ rosdep install --from-paths src --ignore-src -r -y
 # Install Python dependencies
 echo ""
 echo "Creating virtual environment at $VENV_PATH..."
+sudo apt install -y python3.10-venv
 python3 -m venv $VENV_PATH --system-site-packages
 echo "Activating virtual environment..."
 source $VENV_PATH/bin/activate
@@ -160,12 +180,12 @@ pip install $WS/src/ROS_Create3_Agent/ros_create3_agent
 echo ""
 echo "Building workspace..."
 export IGNITION_VERSION=fortress
-colcon build || colcon build --parallel-workers 2
+colcon build --symlink-install || colcon build --symlink-install --parallel-workers 2
 
-# Fix agent script to use virtualenv's Python
+# Fix agent script to use venv's Python
 AGENT_SCRIPT="$WS/install/ros_create3_agent/lib/ros_create3_agent/agent"
 if [ -f "$AGENT_SCRIPT" ]; then
-  echo "Patching agent script to use virtualenv Python..."
+  echo "Patching agent script to use venv Python..."
   sed -i "1s|^.*$|#!$VENV_PATH/bin/python3|" "$AGENT_SCRIPT"
 fi
 
