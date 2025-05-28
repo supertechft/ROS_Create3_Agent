@@ -64,7 +64,7 @@ Alternatively, we've prepared a full step-by-step environment setup guide as wel
     - Source the workspace
 
 3. **Configure environment variables**:
-  Edit `.env` file to add your `OPENAI_API_KEY` and `HF_API_KEY`. 
+  Edit `.env` file to add your `OPENAI_API_KEY` and `HF_API_KEY`. The `.env` file should be in the `~/ros_create3_agent_ws/src/ROS_Create3_Agent/ros_create3_agent` directory unless changed in the setup phase.
   - Get OpenAI key at https://platform.openai.com/account/api-keys
   - Get HuggingFace key at https://huggingface.co/settings/tokens
 

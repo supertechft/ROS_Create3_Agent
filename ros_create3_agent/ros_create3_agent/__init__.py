@@ -10,6 +10,11 @@ from ros_create3_agent.web.app import initialize as initialize_web
 from ros_create3_agent.llm.llm import get_llm, get_HF_inference
 from ros_create3_agent.llm.prompts import get_prompts
 from ros_create3_agent.rosa_config import *
+from ros_create3_agent.utils import (
+    spin_until_complete_in_executor,
+    run_in_executor,
+    shutdown_executors,
+)
 
 # Legacy import names for backward compatibility
 import ros_create3_agent.web.app as web
