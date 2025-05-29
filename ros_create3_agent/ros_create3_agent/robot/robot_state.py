@@ -219,26 +219,15 @@ class RobotState:
                     }
                 )
 
-                # Send robot messages for specific hazards, with not more than once every 10s per hazard type
-                if hazard_name in ("BUMP", "CLIFF", "STALL"):
-                    last_hazard_notify = getattr(
-                        self, f"_last_notify_{hazard_name.lower()}", 0
-                    )
-                    if current_time - last_hazard_notify > 10.0: # 10 seconds
-                        setattr(
-                            self, f"_last_notify_{hazard_name.lower()}", current_time
-                        )
+                # Send robot message for BUMP but not more than once every 10s
+                if hazard_name == "BUMP":
+                    last_bump_notify = getattr(self, "_last_notify_bump", 0)
+                    if current_time - last_bump_notify > 10.0:  # 10 seconds
+                        setattr(self, "_last_notify_bump", current_time)
                         try:
                             from ros_create3_agent.web.app import add_robot_message
 
-                            if hazard_name == "BUMP":
-                                add_robot_message("Ouch! I bumped into something.")
-                            elif hazard_name == "CLIFF":
-                                add_robot_message("Whoa! I see a cliff or drop-off!")
-                            elif hazard_name == "STALL":
-                                add_robot_message(
-                                    "Help! I'm trapped and can't move!"
-                                )
+                            add_robot_message("Ouch! I bumped into something.")
                         except Exception as e:
                             self.node.get_logger().error(
                                 f"Error sending hazard message: {e}"

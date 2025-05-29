@@ -57,7 +57,7 @@ def _check_dock_visibility_and_warn(dock_visible, operation="dock"):
 def _execute_dock_action(action_client, goal, action_name):
     """Execute dock action in a thread pool."""
     _get_node().get_logger().info(f"{action_name}...")
-    web.add_robot_message(f"Attempting to {action_name.lower()}...")
+    web.add_robot_message(f"{action_name.lower()}...")
 
     future = action_client.send_goal_async(goal)
     spin_until_complete_in_executor(_get_node(), future).result()
