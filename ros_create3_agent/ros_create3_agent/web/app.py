@@ -38,6 +38,10 @@ robot_state = None
 # Chat history (list of dicts: {content, sender (user/robot/agent)})
 chat_history = []
 
+# Track command execution
+command_executing = False
+command_executing_lock = threading.Lock()
+
 
 # Helper to trim chat history
 def _trim_chat_history():
@@ -93,11 +97,24 @@ def _run_flask_app() -> None:
 
 def _process_user_input(user_input: str) -> None:
     """
-    This function adds the message to chat history and offloads LLM processing to a background thread.
+    This function adds the message to chat history and offloads LLM executing to a background thread.
     """
-    logger.info(f"Processing command via web: {user_input}")
+    logger.info(f"Executing command via web: {user_input}")
     # Using shared thread pool to prevent blocking the Flask thread
     run_in_executor(_process_user_input_background, user_input)
+
+
+def _is_executing_command():
+    """Check if a command is currently being executed."""
+    with command_executing_lock:
+        return command_executing
+
+
+def _set_command_executing(state):
+    """Set the command executing state."""
+    global command_executing
+    with command_executing_lock:
+        command_executing = state
 
 
 def _process_user_input_background(user_input: str):
@@ -107,6 +124,8 @@ def _process_user_input_background(user_input: str):
     This runs in a separate thread to prevent blocking the Flask server.
     """
     try:
+        _set_command_executing(True)
+
         # Check if the user input is an audio command
         if user_input.lower().strip() == "audio":
             logger.info("Listening for verbal input...")
@@ -128,9 +147,11 @@ def _process_user_input_background(user_input: str):
 
         _add_agent_message(response)
     except Exception as e:
-        error_msg = f"Error processing command: {str(e)}"
+        error_msg = f"Error executing command: {str(e)}"
         logger.error(error_msg)
         _add_agent_message(error_msg)
+    finally:
+        _set_command_executing(False)
 
 
 @app.route("/")
@@ -160,3 +181,9 @@ def post_message():
             "status": robot_state.get_state(),
         }
     )
+
+
+@app.route("/api/status", methods=["GET"])
+def api_status():
+    """API endpoint to check if a command is being executed."""
+    return jsonify({"executing": _is_executing_command()})

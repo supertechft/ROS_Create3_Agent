@@ -14,6 +14,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const proximityReadings = document.getElementById('proximity-readings');
     const cliffReadings = document.getElementById('cliff-readings');
     const MAX_MESSAGES = 100;
+    const POLL_RATE_MS = 500;
+
+    // Track command execution state
+    let commandExecuting = false;
+    let statusCheckInterval = null;
 
 
     // Initialize markdown-it for agent message formatting
@@ -22,12 +27,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Initial load and polling for chat and robot status
     fetchChatHistoryAndRobotStatus();
-    setInterval(fetchChatHistoryAndRobotStatus, 500); // Poll every 0.5 seconds
+    setInterval(fetchChatHistoryAndRobotStatus, POLL_RATE_MS);
 
 
     // Event listeners for sending messages
     sendButton.addEventListener('click', sendMessage);
-    audioButton.addEventListener('click', function() {
+    audioButton.addEventListener('click', function () {
         sendMessage(true);
     });
     messageInput.addEventListener('keypress', function (e) {
@@ -44,6 +49,45 @@ document.addEventListener('DOMContentLoaded', function () {
                 updateRobotStatus(data.status);
             })
             .catch(error => console.error('Error fetching chat history:', error));
+    }
+
+    // Check command execution status
+    function checkCommandStatus() {
+        fetch('/api/status')
+            .then(response => response.json())
+            .then(data => {
+                if (data.executing !== commandExecuting) {
+                    commandExecuting = data.executing;
+                    if (commandExecuting) {
+                        disableUIElements();
+                    } else {
+                        enableUIElements();
+                        if (statusCheckInterval) {
+                            clearInterval(statusCheckInterval);
+                            statusCheckInterval = null;
+                        }
+                    }
+                }
+            })
+            .catch(error => console.error('Error checking command status:', error));
+    }
+
+    // Helper functions to disable/enable UI
+    function disableUIElements() {
+        messageInput.disabled = true;
+        audioButton.disabled = true;
+        audioButton.classList.add('disabled');
+        sendButton.disabled = true;
+        sendButton.classList.add('disabled');
+    }
+
+    function enableUIElements() {
+        messageInput.disabled = false;
+        audioButton.disabled = false;
+        audioButton.classList.remove('disabled');
+        sendButton.disabled = false;
+        sendButton.classList.remove('disabled');
+        messageInput.focus();
     }
 
 
@@ -290,13 +334,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const message = (audio) ? "audio" : messageInput.value.trim();
         if (!message) return;
 
-        // Disable input while waiting for server response
-        messageInput.disabled = true;
-        audioButton.disabled = true;
-        audioButton.classList.add('disabled');
-        sendButton.disabled = true;
-        sendButton.classList.add('disabled');
+        // Disable UI elements immediately
+        disableUIElements();
         messageInput.value = '';
+
+        // Start polling for command status using the defined poll rate
+        if (!statusCheckInterval) {
+            statusCheckInterval = setInterval(checkCommandStatus, POLL_RATE_MS);
+        }
 
         // Send message to flask server
         fetch('/api/chat', {
@@ -308,21 +353,16 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(data => {
                 updateChatHistory(data.history);
                 updateRobotStatus(data.status);
-                // Re-enable input after response
-                messageInput.disabled = false;
-                audioButton.disabled = false;
-                audioButton.classList.remove('disabled');
-                sendButton.disabled = false;
-                sendButton.classList.remove('disabled');
-                messageInput.focus();
             })
             .catch(error => {
                 console.error('Error sending message:', error);
-                messageInput.disabled = false;
-                audioButton.disabled = false;
-                audioButton.classList.remove('disabled');
-                sendButton.disabled = false;
-                sendButton.classList.remove('disabled');
+                // If there's an error in the API call itself,
+                // re-enable the UI since the command never started executing
+                if (statusCheckInterval) {
+                    clearInterval(statusCheckInterval);
+                    statusCheckInterval = null;
+                }
+                enableUIElements();
             });
     }
 });
