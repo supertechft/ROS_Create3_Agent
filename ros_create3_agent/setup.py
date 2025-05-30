@@ -7,7 +7,7 @@ package_name = "ros_create3_agent"
 setup(
     name=package_name,
     version="1.0.0",
-    packages=find_packages(exclude=["test"]),
+    packages=find_packages(),
     data_files=[
         ("share/ament_index/resource_index/packages", ["resource/" + package_name]),
         ("share/" + package_name, ["package.xml"]),
@@ -29,7 +29,6 @@ setup(
     maintainer_email="psingh@supertechft.org",
     description="Embodied ROS agent for the iRobot Create 3 robot",
     license="Apache 2.0",
-    tests_require=["pytest"],
     entry_points={
         "console_scripts": [
             "agent = ros_create3_agent.agent:main",

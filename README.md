@@ -179,10 +179,6 @@ ros_create3_agent/
 │   └── agent.launch.py             # ROS 2 launch file for agent and simulator
 ├── resource/
 │   └── ros_create3_agent           # ROS resource marker
-├── test/                           # Lint/test scripts
-│   └── ...
-├── z_notes/                        # Project notes (not required)
-│   └── note.md
 ├── .env                            # Environment variables for API keys (see below)
 ├── setup.sh                        # Installation and build script
 ├── launch.sh                       # Script to launch simulator and agent
