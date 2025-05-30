@@ -1,6 +1,7 @@
 """
 Centralized robot state management for the Create 3 robot.
 This module handles all ROS topic subscriptions and maintains the current robot state.
+https://iroboteducation.github.io/create3_docs/api/ros2/
 """
 
 import threading
@@ -197,10 +198,6 @@ class RobotState:
             hazard_details = []
             current_time = time.time()
             for detection in msg.detections:
-                # Skip hazards with frame_id "base_link"
-                # TODO: Seems to always have a HAZARD_TYPES value of 0 (BACKUP_LIMIT) (Check real robot)
-                if detection.header.frame_id == "base_link":
-                    continue
 
                 # Convert numerical type to string representation
                 hazard_name = HAZARD_TYPES.get(

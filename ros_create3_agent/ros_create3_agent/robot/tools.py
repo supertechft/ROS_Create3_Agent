@@ -47,6 +47,9 @@ from .core.sensing import (
 # Import robot state manager
 from .robot_state import get_robot_state
 
+# Import safety configuration
+from .safety import configure_safety_parameters
+
 # Global variables for shared state
 _node = None
 _drive_distance_client = None
@@ -82,3 +85,7 @@ def initialize(node: Node):
 
     # Initialize the robot state with the node
     get_robot_state(node)
+
+    # Configure safety parameters: disable backup limit
+    # https://iroboteducation.github.io/create3_docs/api/safety/
+    configure_safety_parameters(_node, safety_override="backup_only")
