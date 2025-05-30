@@ -120,12 +120,14 @@ Similar to `setup.sh`, `launch.sh` accepts `--ros-distro`, `--venv-path`, and `-
 ---
 
 ## Development Notes
+
 - Follow these ROSA [Custom Agents](https://github.com/nasa-jpl/rosa/wiki/Custom-Agents) and [Developer Documentation](https://github.com/nasa-jpl/rosa/wiki/Developer-Documentation) guides.
 - Ensure prompts are similar to [TurtleSim](https://github.com/supertechft/JPL-Mars-Rover/blob/main/src/turtle_agent/scripts/prompts.py).
 - Create3 [ROS 2 documentation](https://iroboteducation.github.io/create3_docs/).
 - Use [iRobot Create 3 Simulator](https://github.com/iRobotEducation/create3_sim) for testing.
 - Follow [ROS 2 Tutorials](https://docs.ros.org/en/humble/Tutorials.html).
   - Consider adding the `--symlink-install` flag to `colcon build` to speed up development (see [humble docs](https://docs.ros.org/en/humble/Tutorials/Beginner-Client-Libraries/Colcon-Tutorial.html#build-the-workspace)).
+- The agent sets the Create 3's `safety_override` parameter to `backup_only` to enable moving backwards. The default is `none` which prevents the robot from not travelling backwards unless it's already explored that area but we didn't find this to work well. Note that the agent does not automatically revert to the default on shutdown. For more details, see the [Create 3 safety documentation](https://iroboteducation.github.io/create3_docs/api/safety/).
 - Chat history is managed by a custom Python list in `web/app.py` (not by ROSA)
 - Robot state is updated via callback and shown in the web UI `script.js`.
 
