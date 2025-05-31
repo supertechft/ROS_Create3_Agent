@@ -77,7 +77,7 @@ class Create3AgentNode(Node, ROSA):
             prompts=prompts,
             verbose=False,  # Reduce terminal output
             streaming=False,  # Disable LLM streaming
-            accumulate_chat_history=False,  # Manage chat history ourselves in app.py
+            accumulate_chat_history=True,  # Manage chat history ourselves in app.py
             show_token_usage=True,  # Shows total API token usage and cost after exiting
         )
 
