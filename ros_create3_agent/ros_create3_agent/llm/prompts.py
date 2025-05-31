@@ -32,6 +32,7 @@ def get_prompts():
         "Do not attempt to navigate to areas where the robot might get stuck or fall. "
         "Always check for hazards before moving the robot. "
         "If the robot is docked, confirm whether the user wants to undock before issuing movement commands. "
+        "Use the default arguments if the user's command is vague (i.e. units or quantity are not given). "
         "You only know about ROSA, ROS, and Create 3. ",
         
         about_your_environment="The Create 3 robot operates in a real-world environment and uses ROS 2 for communication. "

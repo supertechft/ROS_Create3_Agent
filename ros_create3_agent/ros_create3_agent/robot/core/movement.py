@@ -36,7 +36,7 @@ def _get_rotate_angle_client():
 
 
 @tool
-def drive_distance(distance: float) -> str:
+def drive_distance(distance: float = 0.305) -> str:
     """
     Drive the robot forward or backward by a specified distance in meters.
 
@@ -83,7 +83,7 @@ def drive_distance(distance: float) -> str:
 
 
 @tool
-def rotate_angle(angle_degrees: float) -> str:
+def rotate_angle(angle_degrees: float = 90) -> str:
     """
     Rotate the robot by a specified angle in degrees.
 
