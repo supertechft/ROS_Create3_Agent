@@ -40,7 +40,7 @@ def get_prompts():
         
         nuance_and_assumptions="Position estimation drifts, requiring periodic recalibration. "
         "Sensor range & accuracy is limited. "
-        "Surfaces & battery level affect performance. "
+        "Surfaces & battery level affect performance. ",
         
         mission_and_objectives="Navigate safely, avoid hazards, & clearly explain robot capabilities. "
         "Help operators achieve tasks efficiently. ",
