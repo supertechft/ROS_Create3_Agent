@@ -125,12 +125,9 @@ def _verify_operation_result(expected_docked_state, operation, robot_state):
 @tool
 def dock_robot() -> str:
     """
-    Command the robot to return to its docking station and begin recharging.
-
+    Command robot to dock and recharge.
     Returns:
-        str: A message describing the result of the docking action, including success or failure.
-
-    Sends the robot to search for and connect to its charging dock. Useful for charging, moving to a known position, or starting recharge when battery is low.
+        str: Docking result message.
     """
     try:
         # Get current dock status information
@@ -163,12 +160,9 @@ def dock_robot() -> str:
 @tool
 def undock_robot() -> str:
     """
-    Command the robot to undock from its charging station.
-
+    Command robot to undock from charger.
     Returns:
-        str: A message describing the result of the undocking action, including success or failure.
-
-    Commands the robot to disengage from its charging dock and back away to become available for other operations.
+        str: Undocking result message.
     """
     try:
         # Get current dock status information
@@ -198,12 +192,9 @@ def undock_robot() -> str:
 @tool
 def check_dock_status() -> str:
     """
-    Check if the robot is currently docked at its charging station.
-
+    Check if robot is docked and charging.
     Returns:
-        str: A message indicating whether the robot is docked and charging, or not docked.
-
-    Queries the robot's docking state and battery status to determine if it is docked and whether it is charging.
+        str: Docked/charging state.
     """
     try:
         status = _get_status_message(include_details=True)

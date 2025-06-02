@@ -10,10 +10,10 @@ from langchain.agents import tool
 @tool
 def agent_intro() -> str:
     """
-    Introduction to the Create 3 ROS Agent and how to interact with it.
-    Describes the agent's capabilities, how to use text and voice (audio) input, and lists available info/help tools.
+    Introduction to the Create 3 ROS Agent & how to interact with it.
+    Describes the agent's capabilities, how to use text & voice (audio) input, & lists available info/help tools.
     Returns:
-        A string introduction for the user.
+        str: Agent intro message.
     """
     return """
     Welcome to the iRobot Create 3 ROS Agent!
@@ -43,9 +43,9 @@ def agent_intro() -> str:
 @tool
 def get_help() -> str:
     """
-    Show help and usage tips for the Create 3 agent, including core and advanced capabilities, safety, and troubleshooting.
+    Show help & usage tips for the Create 3 agent, including core & advanced capabilities, safety, & troubleshooting.
     Returns:
-        A string with help and usage tips for the agent.
+        str: Help message.
     """
     return """
     # Create3 Agent Help
@@ -85,17 +85,15 @@ def get_help() -> str:
 @tool
 def get_examples() -> str:
     """
-    Show example queries and commands for interacting with the Create 3 robot and ROS 2 environment.
+    Show example queries and commands.
     Returns:
-        A string with example queries and commands.
+        str: Example queries.
     """
     return """
     Example queries you can try:
-    - Move the robot forward at 0.1 m/s for 5 seconds.
     - Rotate the robot 90 degrees clockwise.
     - Check if there are any hazards detected.
     - Check if the robot is currently docked.
-    - Draw a square pattern with 0.5 meter sides.
     - List all active ROS topics.
     - Check the system with ros2_doctor.
     - Show me the available ROS services.
@@ -112,9 +110,9 @@ def get_examples() -> str:
 @tool
 def get_dock_info() -> str:
     """
-    Provide general information about the Create 3 Home Base docking station, its features, and its role in robot operation and navigation.
+    Info about Create 3 docking station.
     Returns:
-        A string describing the docking station and its features.
+        str: Docking station info.
     """
     return """
     The Create 3 Home Base is the docking station for the robot.
@@ -129,9 +127,9 @@ def get_dock_info() -> str:
 @tool
 def get_create3_specs() -> str:
     """
-    Get general information about hardware specs and platform overview for the iRobot Create 3 robot, including sensors, processing, and connectivity.
+    Get general information about hardware specs & platform overview for the iRobot Create 3 robot, including sensors, processing, & connectivity.
     Returns:
-        A string describing the robot's hardware specifications.
+        str: Hardware specs.
     """
     return """
     The iRobot Create 3 is an educational robot platform based on the Roomba robot vacuum.
@@ -152,10 +150,9 @@ def get_create3_specs() -> str:
 @tool
 def get_create3_interface() -> str:
     """
-    Briefly list the main ROS 2 interface for the iRobot Create 3 robot, including all topics, services, actions, and key parameters.
-    This tool is useful for users who want to know what APIs are available for interacting with the robot via ROS 2.
+    List main ROS 2 interfaces (topics, services, actions, params).
     Returns:
-        A formatted string summarizing the main topics, services, actions, and parameters.
+        str: Interface summary.
     """
     return """
     # Create 3 ROS 2 Interface Overview
