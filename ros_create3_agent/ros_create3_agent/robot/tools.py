@@ -46,6 +46,9 @@ from .core.sensing import (
     get_odometry,
     get_stop_status,
 )
+from .core.sequences import (
+    dance,
+)
 
 # Import robot state manager
 from .robot_state import get_robot_state

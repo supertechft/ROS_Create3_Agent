@@ -75,6 +75,8 @@ class Create3AgentNode(Node, ROSA):
                 tools.get_kidnap_status,
                 tools.get_odometry,
                 tools.get_stop_status,
+                # Sequences
+                tools.dance,
             ],
             prompts=prompts,
             verbose=False,  # Reduce terminal output
