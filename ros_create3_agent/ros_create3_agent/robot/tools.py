@@ -12,6 +12,7 @@ from rclpy.node import Node
 from irobot_create_msgs.action import (
     DriveDistance,
     RotateAngle,
+    DriveArc,
     NavigateToPosition,
     Undock,
     Dock,
@@ -34,6 +35,8 @@ from .core.info import (
 from .core.movement import (
     drive_distance,
     rotate_angle,
+    drive_arc,
+    navigate_to_position,
 )
 from .core.sensing import (
     get_battery_status,
@@ -54,6 +57,7 @@ from .safety import configure_safety_parameters
 _node = None
 _drive_distance_client = None
 _rotate_angle_client = None
+_drive_arc_client = None
 _navigate_to_position_client = None
 _dock_client = None
 _undock_client = None
@@ -61,13 +65,14 @@ _undock_client = None
 
 def initialize(node: Node):
     """Initialize all the ROS clients and subscribers."""
-    global _node, _drive_distance_client, _rotate_angle_client, _navigate_to_position_client, _dock_client, _undock_client
+    global _node, _drive_distance_client, _rotate_angle_client, _drive_arc_client, _navigate_to_position_client, _dock_client, _undock_client
 
     _node = node
 
     # Action clients
     _drive_distance_client = ActionClient(_node, DriveDistance, "drive_distance")
     _rotate_angle_client = ActionClient(_node, RotateAngle, "rotate_angle")
+    _drive_arc_client = ActionClient(_node, DriveArc, "drive_arc")
     _navigate_to_position_client = ActionClient(
         _node, NavigateToPosition, "navigate_to_position"
     )
@@ -78,6 +83,7 @@ def initialize(node: Node):
     _node.get_logger().info("Waiting for action servers...")
     _drive_distance_client.wait_for_server()
     _rotate_angle_client.wait_for_server()
+    _drive_arc_client.wait_for_server()
     _navigate_to_position_client.wait_for_server()
     _dock_client.wait_for_server()
     _undock_client.wait_for_server()

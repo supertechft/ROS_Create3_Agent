@@ -4,7 +4,7 @@ ROSA Documentation
 - https://github.com/nasa-jpl/rosa/wiki/Developer-Documentation
 """
 
-import os
+import threading
 from pathlib import Path
 import rclpy  # https://docs.ros.org/en/humble/p/rclpy/
 from rclpy.node import Node
@@ -66,6 +66,8 @@ class Create3AgentNode(Node, ROSA):
                 # Movement
                 tools.drive_distance,
                 tools.rotate_angle,
+                tools.drive_arc,
+                tools.navigate_to_position,
                 # Sensing
                 tools.get_battery_status,
                 tools.check_hazards,
@@ -96,7 +98,6 @@ class Create3AgentNode(Node, ROSA):
         This is essential for the web interface to work properly.
         ROS callbacks are processed even when the main thread is busy serving HTTP requests.
         """
-        import threading
 
         def _spin_node():
             while self.running and rclpy.ok():

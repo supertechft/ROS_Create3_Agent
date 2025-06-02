@@ -14,7 +14,7 @@ from .info import (
     get_create3_specs,
     get_create3_interface,
 )
-from .movement import drive_distance, rotate_angle
+from .movement import drive_distance, rotate_angle, drive_arc, navigate_to_position
 from .sensing import (
     get_battery_status,
     check_hazards,
