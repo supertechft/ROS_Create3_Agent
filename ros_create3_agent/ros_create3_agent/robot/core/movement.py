@@ -38,15 +38,11 @@ def _get_rotate_angle_client():
 @tool
 def drive_distance(distance: float = 0.305) -> str:
     """
-    Drive the robot forward or backward by a specified distance in meters.
-
+    Drive robot a set distance (meters).
     Args:
-        distance (float): The distance to travel in meters (positive for forward, negative for backward).
-
+        distance (float): Meters to move (+forward, -back).
     Returns:
-        str: A message describing the result of the action.
-
-    Performs a hazard check before moving. Will not move if hazards are detected.
+        str: Result message.
     """
     try:
         # Parameter validation
@@ -85,15 +81,11 @@ def drive_distance(distance: float = 0.305) -> str:
 @tool
 def rotate_angle(angle_degrees: float = 90) -> str:
     """
-    Rotate the robot by a specified angle in degrees.
-
+    Rotate robot by angle (degrees).
     Args:
-        angle_degrees (float): The angle to rotate in degrees (positive for counterclockwise, negative for clockwise).
-
+        angle_degrees (float): Degrees to rotate (+ccw, -cw).
     Returns:
-        str: A message describing the result of the action.
-
-    Performs a hazard check before rotating. Will not rotate if hazards are detected.
+        str: Result message.
     """
     try:
         # Parameter validation
