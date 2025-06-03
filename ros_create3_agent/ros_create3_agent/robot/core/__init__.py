@@ -23,4 +23,4 @@ from .sensing import (
     get_odometry,
     get_stop_status,
 )
-from .sequences import dance
+from .user_interface import dance

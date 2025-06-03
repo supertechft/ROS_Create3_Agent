@@ -1,5 +1,6 @@
 """
-Dance sequence tools for Create 3 robot
+User interface tools for Create 3 robot
+Including dance sequences, light controls, and audio interactions
 """
 
 import time

@@ -46,7 +46,7 @@ from .core.sensing import (
     get_odometry,
     get_stop_status,
 )
-from .core.sequences import (
+from .core.user_interface import (
     dance,
 )
 
