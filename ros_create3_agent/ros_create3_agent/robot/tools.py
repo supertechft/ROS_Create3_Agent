@@ -16,6 +16,7 @@ from irobot_create_msgs.action import (
     NavigateToPosition,
     Undock,
     Dock,
+    AudioNoteSequence,
 )
 
 # Import from core modules to re-export
@@ -49,6 +50,7 @@ from .core.sensing import (
 from .core.user_interface import (
     dance,
     change_lightring_color,
+    play_audio,
 )
 
 # Import robot state manager
@@ -65,11 +67,12 @@ _drive_arc_client = None
 _navigate_to_position_client = None
 _dock_client = None
 _undock_client = None
+_audio_note_sequence_client = None
 
 
 def initialize(node: Node):
     """Initialize all the ROS clients and subscribers."""
-    global _node, _drive_distance_client, _rotate_angle_client, _drive_arc_client, _navigate_to_position_client, _dock_client, _undock_client
+    global _node, _drive_distance_client, _rotate_angle_client, _drive_arc_client, _navigate_to_position_client, _dock_client, _undock_client, _audio_note_sequence_client
 
     _node = node
 
@@ -82,6 +85,9 @@ def initialize(node: Node):
     )
     _dock_client = ActionClient(_node, Dock, "dock")
     _undock_client = ActionClient(_node, Undock, "undock")
+    _audio_note_sequence_client = ActionClient(
+        _node, AudioNoteSequence, "audio_note_sequence"
+    )
 
     # Wait for action servers
     _node.get_logger().info("Waiting for action servers...")
@@ -91,6 +97,7 @@ def initialize(node: Node):
     _navigate_to_position_client.wait_for_server()
     _dock_client.wait_for_server()
     _undock_client.wait_for_server()
+    _audio_note_sequence_client.wait_for_server()
     _node.get_logger().info("All action servers are ready!")
 
     # Initialize the robot state with the node

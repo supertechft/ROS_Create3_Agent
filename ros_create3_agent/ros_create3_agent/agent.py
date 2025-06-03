@@ -78,6 +78,7 @@ class Create3AgentNode(Node, ROSA):
                 # User Interface
                 tools.dance,
                 tools.change_lightring_color,
+                tools.play_audio,
             ],
             prompts=prompts,
             verbose=False,  # Reduce terminal output
