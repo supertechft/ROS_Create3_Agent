@@ -23,4 +23,4 @@ from .sensing import (
     get_odometry,
     get_stop_status,
 )
-from .user_interface import dance, change_lightring_color
+from .user_interface import dance, change_lightring_color, play_audio

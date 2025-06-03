@@ -1,10 +1,12 @@
 """
 User interface tools for Create 3 robot
 Including dance sequences, light controls, and audio interactions
+https://iroboteducation.github.io/create3_docs/api/ui/
 """
 
+import random
 import time
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from langchain.agents import tool
 import rclpy
 from rclpy.executors import SingleThreadedExecutor
@@ -20,6 +22,27 @@ from .dance import (
     FinishedDance,
 )
 from .lightring import LightringPublisher
+from .audio import (
+    validate_audio_parameters,
+    create_audio_notes,
+    execute_audio_sequence,
+)
+
+
+# Accessors for shared ROS node and action clients from the tools module.
+# These are used instead of direct imports because the objects are initialized at runtime.
+def _get_tools():
+    from .. import tools
+
+    return tools
+
+
+def _get_node():
+    return _get_tools()._node
+
+
+def _get_audio_note_sequence_client():
+    return _get_tools()._audio_note_sequence_client
 
 
 @tool
@@ -32,8 +55,6 @@ def dance(pattern: str = "random") -> str:
     Returns:
         Status or error message.
     """
-    import random
-
     # Validate the pattern input
     if not isinstance(pattern, str):
         return f"Error: Pattern must be a string, got {type(pattern).__name__}"
@@ -174,12 +195,6 @@ def dance(pattern: str = "random") -> str:
         return f"Oh no! I tripped on my dance moves: {e}"
 
 
-def _get_lightring_publisher() -> LightringPublisher:
-    """Get a fixed-name lightring publisher instance."""
-    node_name = "rosa_lightring_control"
-    return LightringPublisher(node_name)
-
-
 @tool
 def change_lightring_color(
     color: Optional[str] = None,
@@ -205,7 +220,7 @@ def change_lightring_color(
         return "Error: Unable to access robot state. Robot may not be connected"
 
     try:
-        publisher = _get_lightring_publisher()
+        publisher = LightringPublisher("rosa_lightring_control")
         executor = SingleThreadedExecutor()
         executor.add_node(publisher)
 
@@ -284,3 +299,68 @@ def change_lightring_color(
             executor.shutdown()
         except Exception:
             pass
+
+
+@tool
+def play_audio(
+    frequencies: Optional[List[Dict[str, Any]]] = None,
+    tune: Optional[str] = None,
+) -> str:
+    """
+    Play audio notes or tunes on the robot. Random if frequencies and tune are not given.
+
+    Args:
+        frequencies: List of dicts with 'frequency' (Hz, int) and 'duration' (microseconds, int or float).
+            Frequency range: 50-1200 Hz. Max duration: 30 sec.
+        tune: Plays a predefined tune:
+            - Twinkle
+            - Happy birthday
+            - Mary had little lamb
+            - Alert
+            - Success
+            - Error
+            - Startup
+            - Random
+
+    Returns:
+        Status message or error description.
+    """
+    node = _get_node()
+
+    # Validate parameters using audio module (handles both dict and tuple formats)
+    is_valid, error_message, validated_notes = validate_audio_parameters(
+        frequencies, tune
+    )
+    if not is_valid:
+        node.get_logger().error(error_message)
+        return error_message
+
+    # Calculate total duration for timeout
+    total_duration_microseconds = sum(duration for _, duration in validated_notes)
+
+    # Check robot state
+    robot_state_manager = get_robot_state()
+    if not robot_state_manager:
+        node.get_logger().error(
+            "Unable to access robot state in play_audio. Robot may not be connected"
+        )
+        return "Error: Unable to access robot state. Robot may not be connected"
+
+    try:
+        # Get action client and node using local accessors
+        audio_client = _get_audio_note_sequence_client()
+        if audio_client is None or node is None:
+            return (
+                "Error: Audio action client not available. Robot may not be connected"
+            )
+
+        # Create audio notes using audio module
+        audio_notes = create_audio_notes(validated_notes)
+
+        # Execute audio sequence using audio module
+        return execute_audio_sequence(
+            audio_client, node, audio_notes, total_duration_microseconds, tune
+        )
+
+    except Exception as e:
+        return f"Error: Failed to play audio: {e}"
