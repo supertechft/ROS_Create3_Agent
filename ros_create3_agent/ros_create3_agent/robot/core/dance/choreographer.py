@@ -7,22 +7,7 @@ https://github.com/iRobotEducation/create3_examples/blob/humble/create3_examples
 import math
 from typing import List, Tuple, Union
 from irobot_create_msgs.msg import LedColor
-
-
-class ColorPalette:
-    """Helper class to define frequently used colors for LED lightring"""
-
-    def __init__(self):
-        self.red = LedColor(red=255, green=0, blue=0)
-        self.green = LedColor(red=0, green=255, blue=0)
-        self.blue = LedColor(red=0, green=0, blue=255)
-        self.yellow = LedColor(red=255, green=255, blue=0)
-        self.pink = LedColor(red=255, green=0, blue=255)
-        self.cyan = LedColor(red=0, green=255, blue=255)
-        self.purple = LedColor(red=127, green=0, blue=255)
-        self.white = LedColor(red=255, green=255, blue=255)
-        self.grey = LedColor(red=189, green=189, blue=189)
-        self.off = LedColor(red=0, green=0, blue=0)
+from ..lightring.color_palette import ColorPalette
 
 
 class Move:

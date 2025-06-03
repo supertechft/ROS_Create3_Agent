@@ -153,11 +153,9 @@ def dance(pattern: str = "random") -> str:
                 except Exception as e:
                     pass
 
-        # Reset lightring to default after dance using change_lightring_color tool
+        # Reset lightring to default after dance
         try:
-            reset_result = change_lightring_color.invoke({"reset": True})
-            if "Successfully reset" in reset_result:
-                web.add_robot_message("My lights are back to normal!")
+            change_lightring_color.invoke({"reset": True})
         except Exception:
             pass  # Continue even if reset fails
 

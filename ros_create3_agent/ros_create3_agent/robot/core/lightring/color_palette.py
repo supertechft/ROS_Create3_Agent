@@ -29,6 +29,7 @@ class ColorPalette:
         "grey": (189, 189, 189),
         "gray": (189, 189, 189),  # Alternative spelling
         "black": (0, 0, 0),
+        "off": (0, 0, 0),
     }
 
     def __init__(self):
