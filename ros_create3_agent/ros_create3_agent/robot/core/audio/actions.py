@@ -11,10 +11,7 @@ from typing import List, Tuple, Union, Optional, Dict, Any
 from irobot_create_msgs.action import AudioNoteSequence
 from irobot_create_msgs.msg import AudioNote, AudioNoteVector
 from builtin_interfaces.msg import Duration
-from ros_create3_agent.utils.ros_threading import (
-    run_in_executor,
-    spin_until_complete_in_executor,
-)
+from ros_create3_agent.utils.ros_threading import spin_until_complete_in_executor
 from ros_create3_agent.web import app as web
 
 from .tunes import PREDEFINED_TUNES
@@ -83,7 +80,10 @@ def validate_audio_parameters(
         if not is_valid:
             return False, error_message, None
         frequencies = tuple_frequencies
-    
+        web.add_robot_message(
+            f"🎵 Playing custom audio sequence with {len(frequencies)} notes!"
+        )
+
     # Parameter validation
     if frequencies is not None and tune is not None:
         return (
@@ -152,10 +152,10 @@ def validate_audio_parameters(
                 f"Error: Frequency at position {i} must be an integer, got {type(freq).__name__}",
                 None,
             )
-        if freq != 0 and (freq < 50 or freq > 1000):  # 0 is for REST notes
+        if freq != 0 and (freq < 50 or freq > 1200):  # 0 is for REST notes
             return (
                 False,
-                f"Error: Frequency {freq} at position {i} is out of range (50-1000 Hz). Use 0 for rest notes.",
+                f"Error: Frequency {freq} at position {i} is out of range (50-1200 Hz). Use 0 for rest notes.",
                 None,
             )
 
@@ -247,39 +247,30 @@ def execute_audio_sequence(
     # Send goal and wait for result
     node.get_logger().info(f"Playing audio sequence with {len(audio_notes)} notes")
 
-    def execute_audio():
-        future = audio_client.send_goal_async(goal)
-        return spin_until_complete_in_executor(node, future)
-
-    # Execute in background thread
-    audio_future = run_in_executor(execute_audio)
-
     try:
         # Wait for action to complete with timeout
         timeout_seconds = (total_duration_microseconds / 1_000_000) + 5.0
-        goal_handle = audio_future.result(timeout=timeout_seconds)
 
-        if goal_handle.accepted:
-            # Wait for the action to complete
-            def wait_for_result():
-                result_future = goal_handle.get_result_async()
-                return spin_until_complete_in_executor(node, result_future)
-
-            result_future = run_in_executor(wait_for_result)
-            result = result_future.result(timeout=timeout_seconds)
-
-            if result.result.complete:
-                duration_played = result.result.runtime.sec + (
-                    result.result.runtime.nanosec / 1_000_000_000
-                )
-                if tune:
-                    return f"🎵 Finished playing '{tune}'! That was {duration_played:.2f} seconds of musical bliss!"
-                else:
-                    return f"🎵 Audio sequence complete! Played {len(audio_notes)} notes in {duration_played:.2f} seconds."
+        # Send goal and wait for result using spin_until_complete_in_executor
+        future = audio_client.send_goal_async(goal)
+        spin_until_complete_in_executor(node, future).result(timeout=timeout_seconds)
+        goal_handle = future.result()
+        if not goal_handle or not goal_handle.accepted:
+            return "Error: Audio goal was rejected by the robot or no goal handle was returned"
+        result_future = goal_handle.get_result_async()
+        spin_until_complete_in_executor(node, result_future).result(
+            timeout=timeout_seconds
+        )
+        result = result_future.result()
+        if result.result.complete:
+            duration_played = result.result.runtime.sec + (
+                result.result.runtime.nanosec / 1_000_000_000
+            )
+            if tune:
+                return f"🎵 Finished playing '{tune}'! That was {duration_played:.2f} seconds of musical bliss!"
             else:
-                return f"⚠️ Audio playback was interrupted after {result.result.iterations_played} iterations"
+                return f"🎵 Audio sequence complete! Played {len(audio_notes)} notes in {duration_played:.2f} seconds."
         else:
-            return "Error: Audio goal was rejected by the robot"
-
+            return f"⚠️ Audio playback was interrupted after {result.result.iterations_played} iterations"
     except Exception as e:
         return f"Error during audio playback: {e}"

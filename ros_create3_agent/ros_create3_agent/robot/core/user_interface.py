@@ -307,13 +307,20 @@ def play_audio(
     tune: Optional[str] = None,
 ) -> str:
     """
-    Play audio notes or tunes on the robot.
+    Play audio notes or tunes on the robot. Random if frequencies and tune are not given.
 
     Args:
         frequencies: List of dicts with 'frequency' (Hz, int) and 'duration' (microseconds, int or float).
-                    Example: [{"frequency": 440, "duration": 500000}, {"frequency": 660, "duration": 500000}]
-        tune: Predefined tune name (twinkle, happy_birthday, mary_had_little_lamb,
-              alert, success, error, startup, random)
+            Frequency range: 50-1200 Hz. Max duration: 30 sec.
+        tune: Plays a predefined tune:
+            - Twinkle
+            - Happy birthday
+            - Mary had little lamb
+            - Alert
+            - Success
+            - Error
+            - Startup
+            - Random
 
     Returns:
         Status message or error description.
