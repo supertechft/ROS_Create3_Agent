@@ -48,6 +48,7 @@ from .core.sensing import (
 )
 from .core.user_interface import (
     dance,
+    change_lightring_color,
 )
 
 # Import robot state manager
