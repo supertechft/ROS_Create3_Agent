@@ -63,7 +63,7 @@ def dance(pattern: str = "random") -> str:
     start_messages = {
         "circle": "Watch me spin in perfect circles! Time to show off my smooth moves!",
         "spin": "Get ready for some twirls and spins! I hope you don't get dizzy watching!",
-        "party": "It's party time! I'm about to bust out my best robot dance moves!",
+        "party": "It's \"Roomba\" time! I'm about to bust out my best robot dance moves!",
     }
     web.add_robot_message(
         start_messages.get(
