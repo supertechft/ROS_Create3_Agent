@@ -6,8 +6,8 @@ Uses prerecorded audio files for the most important robot messages.
 import os
 import threading
 import queue
-from typing import Dict, Optional
 import re
+from typing import Optional
 
 try:
     from playsound import playsound
@@ -21,14 +21,6 @@ class AudioSystem:
     """Handles audio playback for robot messages."""
 
     def __init__(self, audio_dir: str = "speech_files"):
-        """
-        Initialize the audio system.
-
-        Args:
-            audio_dir: Directory containing prerecorded audio files
-        """
-        # Initialize audio system
-        self.enabled = True
         self.audio_dir = audio_dir
         self.audio_queue = queue.Queue()
         self.is_playing = False
@@ -119,20 +111,12 @@ class AudioSystem:
 
     def _play_audio_file(self, audio_file: str):
         """Play an audio file using playsound."""
-        if not self.enabled:
-            return
-
         if not PLAYSOUND_AVAILABLE:
             raise RuntimeError(f"Cannot play {audio_file}: playsound not available")
-
+        audio_path = os.path.join(self.audio_dir, audio_file)
+        if not os.path.exists(audio_path):
+            raise FileNotFoundError(f"Audio file not found: {audio_path}")
         try:
-            self.is_playing = True
-            audio_path = os.path.join(self.audio_dir, audio_file)
-
-            if not os.path.exists(audio_path):
-                raise FileNotFoundError(f"Audio file not found: {audio_path}")
-
-            # Use playsound for cross-platform audio playback
             playsound(audio_path, block=True)
 
         except Exception as e:
@@ -150,11 +134,8 @@ class AudioSystem:
         Returns:
             Audio file name if message should have audio, None otherwise
         """
-        message_lower = message.lower()
-
-        for category, config in self.priority_messages.items():
-            pattern = config["pattern"]
-            if re.search(pattern, message, re.IGNORECASE):
+        for config in self.priority_messages.values():
+            if re.search(config["pattern"], message, re.IGNORECASE):
                 return config["audio_file"]
 
         return None
@@ -166,9 +147,6 @@ class AudioSystem:
         Args:
             message: The robot message to potentially play audio for
         """
-        if not self.enabled:
-            return
-
         audio_file = self.should_play_audio(message)
         if audio_file:
             # Add to queue for background playback
@@ -176,14 +154,6 @@ class AudioSystem:
                 self.audio_queue.put_nowait(audio_file)
             except queue.Full:
                 raise RuntimeError("Audio queue is full, skipping audio playback")
-
-    def enable(self):
-        """Enable audio playback."""
-        self.enabled = True
-
-    def disable(self):
-        """Disable audio playback."""
-        self.enabled = False
 
     def shutdown(self):
         """Shutdown the audio system."""

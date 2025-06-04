@@ -18,7 +18,7 @@ from rclpy.node import Node
 # Internal imports
 from ros_create3_agent.robot.robot_state import get_robot_state
 from ros_create3_agent.logging import get_logger
-from ros_create3_agent.rosa_config import WEB_PORT, MAX_CHAT_HISTORY
+from ros_create3_agent.rosa_config import WEB_PORT, MAX_CHAT_HISTORY, ENABLE_AUDIO
 from ros_create3_agent.utils.ros_threading import run_in_executor
 
 # Get a logger for this module
@@ -60,14 +60,17 @@ def add_robot_message(content: str):
     chat_history.append({"content": content, "sender": "robot"})
     _trim_chat_history()
 
-    # Play audio for the message if it matches a priority pattern
-    try:
-        from ros_create3_agent.web.audio.audio_system import play_audio_for_message
+    # Play audio for the message if audio is enabled and it matches a priority pattern
+    if ENABLE_AUDIO:
+        try:
+            from ros_create3_agent.web.audio.audio_system import play_audio_for_message
 
-        play_audio_for_message(content)
-    except Exception as e:
-        # Fail silently - don't let audio errors affect robot functionality
-        logger.error(f"Audio playback error: {e}")
+            play_audio_for_message(content)
+        except Exception as e:
+            # Fail silently - don't let audio errors affect robot functionality
+            logger.error(f"Audio playback error: {e}")
+    else:
+        logger.info("Audio playback disabled in configuration")
 
 
 def _add_agent_message(content: str):
@@ -82,13 +85,16 @@ def initialize(node: Node, ros_agent) -> None:
     robot_state = get_robot_state(node)
 
     # Initialize audio system
-    try:
-        from ros_create3_agent.web.audio.audio_system import get_audio_system
+    if ENABLE_AUDIO:
+        try:
+            from ros_create3_agent.web.audio.audio_system import get_audio_system
 
-        audio_system = get_audio_system()
-        logger.info("Audio system initialized for robot messages")
-    except Exception as e:
-        logger.error(f"Failed to initialize audio system: {e}")
+            audio_system = get_audio_system()
+            logger.info("Audio system initialized for robot messages")
+        except Exception as e:
+            logger.error(f"Failed to initialize audio system: {e}")
+    else:
+        logger.info("Audio system disabled in configuration")
 
     # Initialize chat with welcome message
     welcome_msg = "Welcome to the Create 3 Robot Assistant. How can I help you today?"
