@@ -38,60 +38,61 @@ class AudioSystem:
         os.makedirs(audio_dir, exist_ok=True)
 
         # Define the 13 most important message categories with their audio files
+        # NOTE: Order matters! More specific patterns should come first
         self.priority_messages = {
+            # Completion messages
+            "task_completed": {
+                "pattern": r"Finished (moving|rotating|navigating|driving)",
+                "audio_file": "task_completed.mp3",
+            },
             # Movement messages
             "moving": {
                 "pattern": r"Moving .* (forward|backward)",
-                "audio_file": "moving.m4a",
+                "audio_file": "moving.mp3",
             },
             "rotating": {
                 "pattern": r"Rotating .* (clockwise|counterclockwise)",
-                "audio_file": "rotating.m4a",
+                "audio_file": "rotating.mp3",
             },
             "navigating": {
                 "pattern": r"Navigating to position",
-                "audio_file": "navigating.m4a",
+                "audio_file": "navigating.mp3",
             },
             # Docking messages
             # "docking": {
             #     "pattern": r"docking\.\.\.",
-            #     "audio_file": "docking.m4a",
+            #     "audio_file": "docking.mp3",
             #     "sample_text": "Docking"
             # },
             "undocking": {
                 "pattern": r"undocking",
-                "audio_file": "undocking.m4a",
+                "audio_file": "undocking.mp3",
             },
-            # Safety and hazard messages (2 priority messages)
+            # Safety and hazard messages
             "hazard_detected": {
                 "pattern": r"Cannot .* due to hazards",
-                "audio_file": "hazards.m4a",
+                "audio_file": "hazards.mp3",
             },
             # "bumped_into_something": {
             #     "pattern": r"Ouch! I bumped into something",
-            #     "audio_file": "bumped.m4a",
+            #     "audio_file": "bumped.mp3",
             #     "sample_text": "Ouch! I bumped into something"
             # },
-            # Battery and system messages (2 priority messages)
+            # Battery and system messages
             "picked_up": {
                 "pattern": r"I'm being picked up!",
-                "audio_file": "picked_up.m4a",
+                "audio_file": "picked_up.mp3",
             },
-            # Entertainment messages (2 priority messages)
+            # Entertainment messages
             "time_to_dance": {
                 "pattern": r"Time to dance|Watch me spin|Get ready for some twirls|It's.*time!",
-                "audio_file": "dance.m4a",
+                "audio_file": "dance.mp3",
             },
             # "playing_music": {
             #     "pattern": r"🎵 Time to play|🎵 Playing custom audio",
-            #     "audio_file": "playing_music.m4a",
+            #     "audio_file": "playing_music.mp3",
             #     "sample_text": "Time to play some music!"
             # },
-            # Completion message (1 priority message)
-            "task_completed": {
-                "pattern": r"Finished (moving|rotating|navigating|driving)",
-                "audio_file": "task_completed.m4a",
-            },
         }
 
         # Start audio processing thread
