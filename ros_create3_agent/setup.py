@@ -23,6 +23,7 @@ setup(
         "rclpy",
         "jpl-rosa @ git+https://github.com/supertechft/ROSA.git@ASR#egg=jpl-rosa",
         "flask",
+        "playsound",
     ],
     zip_safe=True,
     maintainer="Prince Singh",

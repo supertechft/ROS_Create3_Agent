@@ -34,6 +34,7 @@ app = Flask(
 # Set in initialize()
 rosa = None
 robot_state = None
+audio_system = None
 
 # Chat history (list of dicts: {content, sender (user/robot/agent)})
 chat_history = []
@@ -59,6 +60,15 @@ def add_robot_message(content: str):
     chat_history.append({"content": content, "sender": "robot"})
     _trim_chat_history()
 
+    # Play audio for the message if it matches a priority pattern
+    try:
+        from ros_create3_agent.web.audio.audio_system import play_audio_for_message
+
+        play_audio_for_message(content)
+    except Exception as e:
+        # Fail silently - don't let audio errors affect robot functionality
+        logger.error(f"Audio playback error: {e}")
+
 
 def _add_agent_message(content: str):
     chat_history.append({"content": content, "sender": "agent"})
@@ -67,9 +77,18 @@ def _add_agent_message(content: str):
 
 def initialize(node: Node, ros_agent) -> None:
     """Initialize the web interface for the Create 3 robot agent."""
-    global rosa, robot_state
+    global rosa, robot_state, audio_system
     rosa = ros_agent
     robot_state = get_robot_state(node)
+
+    # Initialize audio system
+    try:
+        from ros_create3_agent.web.audio.audio_system import get_audio_system
+
+        audio_system = get_audio_system()
+        logger.info("Audio system initialized for robot messages")
+    except Exception as e:
+        logger.error(f"Failed to initialize audio system: {e}")
 
     # Initialize chat with welcome message
     welcome_msg = "Welcome to the Create 3 Robot Assistant. How can I help you today?"

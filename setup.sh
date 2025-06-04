@@ -170,7 +170,7 @@ source $VENV_PATH/bin/activate
 echo ""
 echo "Installing Python dependencies..."
 # Install from setup.py / requirements.txt / pyproject.toml
-pip install --upgrade pip setuptools vcstool
+pip install --upgrade pip setuptools wheel vcstool
 pip install $WS/src/ROS_Create3_Agent/ros_create3_agent
 
 
